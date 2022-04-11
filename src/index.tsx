@@ -5,50 +5,81 @@ import type {
     CreateWalletResponse,
     EllipticCurve,
     InitialMessage,
-    SignResponse,
     PurgeWalletResponse,
     SuccessResponse
 } from 'tangem-sdk-react-native';
+import type {
+    CardInfoResult,
+    KeyResults,
+    SignResult,
+    SignCredentialRequest,
+    SignCredentialResponse,
+    SignPresentationRequest,
+    SignPresentationResponse,
+    SignRequest,
+    SignResponse,
+    StoredCredentialsResponse,
+} from './types'
+import {
+    Curve
+} from './constants'
 
 export const NfcSdkModule = TangemSdk;
 
 export default class NfcSdk {
 
-    public static async scanCard(initialMessage?: InitialMessage): Promise<Card> {
-        return await TangemSdk.scanCard(initialMessage);
+    /*
+        TODO:
+        - Test with real card to verify data returned is correct
+    */
+    public static async scanCard(initialMessage?: InitialMessage): Promise<CardInfoResult> {
+        const data = await TangemSdk.scanCard(initialMessage);
+        return {
+          cardId: data.cardId,
+          batchId: data.batchId,
+          cardPublicKeyMultibase: data.cardPublicKey,
+          cardInfo: {
+            curves: data.supportedCurves,
+            firmwareVersion: data.firmwareVersion
+          },
+          linkedTerminal: data.linkedTerminalStatus,
+        };
     }
 
+    /* TODO:
+        - tangem rn-sdk does not have the method createKey, we must investigate where can we get the parameters that the SSI standard has to return
+    */
     public static async createKey(
         cardId: string,
+        unrevokeable: boolean,
         curve: EllipticCurve,
-        initialMessage?: InitialMessage
-    ): Promise<CreateWalletResponse | null> {
-        return await TangemSdk.createWallet(curve, cardId, initialMessage)
-            .then(response => {
-                return response;
-            })
-            .catch(() => {
-                return null;
-            });
+    ): Promise<KeyResults> {
+        const data = await TangemSdk.createWallet(curve, cardId)
+        return {
+          id: data.id,
+          keys: data.keys,
+        }
     }
 
 
     /* TODO:
+        - tangem rn-sdk does not have the method deactiveKey, we must investigate where can we get the parameters that the SSI standard has to return
         -  Can't find correlation on this method between terminal and tangem
         - Waiting for responses from tangem. Provitionally using: purge_wallet
     */
     public static async deactiveKey(
-        walletPublicKey: string,
         cardId: string,
-        initialMessage: InitialMessage
-    ): Promise<PurgeWalletResponse | null> {
-        return await TangemSdk.purgeWallet(walletPublicKey, cardId, initialMessage)
+        keyId: string,
+    ): Promise<null> {
+        const data = await TangemSdk.deactiveKey(cardId, keyId)
+        return null;
+        /*return await TangemSdk.purgeWallet(walletPublicKey, cardId, initialMessage)
             .then(response => {
                 return response;
             })
             .catch(() => {
                 return null;
-            });
+            });*/
     }
 
     /*TODO: 
@@ -88,88 +119,85 @@ export default class NfcSdk {
         return keys
     }
 
-    /* TODO
-        - unable to identify the difference between signCredential, signPresentation and signUsingKey.
-        - implement the three methods, with the same code.
-    */
-    public static async signCredential(
-        hashes: string,
-        walletPublicKey: string,
-        hdPath: string,
-        cardId: string,
-        initialMessage: InitialMessage
-    ): Promise<SignResponse | null> {
-        return await TangemSdk.signHash(hashes, walletPublicKey, cardId, hdPath, initialMessage)
-            .then(response => {
-                return response;
-            })
-            .catch(() => {
-                return null;
-            });
-    }
-
-    /* TODO
-        - unable to identify the difference between signCredential, signPresentation and signUsingKey.
-        - implement the three methods, with the same code.
-    */
-    public static async signPresentation(
-        hashes: string,
-        walletPublicKey: string,
-        hdPath: string,
-        cardId: string,
-        initialMessage: InitialMessage
-    ): Promise<SignResponse | null> {
-        return await TangemSdk.signHash(hashes, walletPublicKey, cardId, hdPath, initialMessage)
-            .then(response => {
-                return response;
-            })
-            .catch(() => {
-                return null;
-            });
-    }
-
-
-    /* TODO
-        - unable to identify the difference between signCredential, signPresentation and signUsingKey.
-        - implement the three methods, with the same code.
+    /* TODO:
+        - tangem rn-sdk does not have the method sign, we must investigate where can we get the parameters that the SSI standard has to return
+        - ssi parameters differs with rnsdk
     */
     public static async signUsingKey(
-        hashes: string,
-        walletPublicKey: string,
-        hdPath: string,
+        keyId: string,
+        signRequest: SignRequest,
         cardId: string,
-        initialMessage: InitialMessage
-    ): Promise<SignResponse | null> {
-        return await TangemSdk.signHash(hashes, walletPublicKey, cardId, hdPath, initialMessage)
+    ): Promise<SignResponse> {
+        const data = await TangemSdk.sign(keyId, signRequest, cardId)
+        return {
+          publicKeyMultibase: data.publicKeyMultibase,
+          signatures: data.signatures,
+        }
+        /*return await TangemSdk.signHash(hashes, walletPublicKey, cardId, hdPath, initialMessage)
             .then(response => {
                 return response;
             })
             .catch(() => {
                 return null;
-            });
+            });*/
     }
+
+
+    /* TODO
+        - method not available on rnsdk
+        - unable to identify the difference between signCredential, signPresentation and signUsingKey.
+        - implement the three methods, with the same code.
+        - ssi parameters differs with rnsdk
+    */
+    public static async signCredential(
+        keyId: string,
+        signCredentialRequest: SignCredentialRequest,
+        cardId: string,
+    ): Promise<SignCredentialResponse> {
+        const data = await TangemSdk.signCredential(keyId, signCredentialRequest, cardId)
+        return {
+          verifiableCredential: data.verifiableCredential,
+          storageId: data.storageId,
+        }
+        /*return await TangemSdk.signHash(hashes, walletPublicKey, cardId, hdPath, initialMessage)
+            .then(response => {
+                return response;
+            })
+            .catch(() => {
+                return null;
+            });*/
+    }
+
+    /* TODO
+        - method not available on rnsdk
+        - unable to identify the difference between signCredential, signPresentation and signUsingKey.
+        - implement the three methods, with the same code.
+        - ssi parameters differs with rnsdk
+    */
+    public static async signPresentation(
+        keyId: string,
+        signPresentationRequest: SignPresentationRequest,
+        cardId: string,
+    ): Promise<SignPresentationResponse> {
+        const data = await TangemSdk.signCredential(keyId, signPresentationRequest, cardId)
+        return {
+          verifiableCredential: data.verifiableCredential,
+        }
+        /*return await TangemSdk.signHash(hashes, walletPublicKey, cardId, hdPath, initialMessage)
+            .then(response => {
+                return response;
+            })
+            .catch(() => {
+                return null;
+            });*/
+    }
+
 
     public static async deleteStoredCredential(
-        indicesToDelete: number[],
+        credentialId: string,
         cardId: string,
-        initialMessage: InitialMessage
     ): Promise<SuccessResponse | null> {
-        return await TangemSdk.deleteFiles(indicesToDelete, cardId, initialMessage)
-            .then(response => {
-                return response;
-            })
-            .catch(() => {
-                return null;
-            });
-    }
-
-    public static async getStoredCredentials(
-        readPrivateFiles: boolean,
-        indices: number[],
-        cardId: string,
-        initialMessage: InitialMessage
-    ): Promise<SuccessResponse | null> {
-         return await TangemSdk.readFiles(readPrivateFiles, indices, cardId, initialMessage)
+        return await TangemSdk.deleteFiles(credentialId, cardId)
             .then(response => {
                 return response;
             })
@@ -179,16 +207,38 @@ export default class NfcSdk {
     }
 
     /* TODO
-        - Needs to be tested with real card
+        - method not available on rnsdk
+        - ssi parameters differs with rnsdk
+    */
+    public static async getStoredCredentials(
+        cardId: string,
+    ): Promise<StoredCredentialsResponse> {
+        const data = await TangemSdk.getStoredCredentials(cardId)
+        return {
+          credentials: data.credentials,
+        }
+        /*return await TangemSdk.readFiles(readPrivateFiles, indices, cardId, initialMessage)
+            .then(response => {
+                return response;
+            })
+            .catch(() => {
+                return null;
+            });*/
+    }
+
+    /* TODO
+        - method not available on rnsdk
+        - ssi parameters differs with rnsdk
     */
     public static async getStoredCredential(
-        readPrivateFiles: boolean,
-        indices: number[],
         cardId: string,
-        initialMessage: InitialMessage,
         credentialId: string,
-    ): Promise<SuccessResponse | null> {
-        const credentials = await TangemSdk.readFiles(readPrivateFiles, indices, cardId, initialMessage)
-        return credentials.filter(cred => cred.id === credentialId )
+    ): Promise<StoredCredentialsResponse> {
+        const data = await TangemSdk.getStoredCredential(cardId)
+        return {
+          credentials: data.credentials,
+        }
+        /*const credentials = await TangemSdk.readFiles(readPrivateFiles, indices, cardId, initialMessage)
+        return credentials.filter(cred => cred.id === credentialId )*/
     }
 }

@@ -33,12 +33,8 @@ NfcSdk.scanCard().then(cardInfo => {
 None
 
 ### Return type
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**cardId** | **String** | The card id Id | [default to null]
-**batchId** | **String** | The manufacturing batch id | [optional] [default to null]
-**cardPublicKeyMultibase** | **String** | The card public key | [optional] [default to null]
-**cardInfo** | **CardInfo** |  | [optional] [default to null]
+
+[**CardInfoResult**](src/types/CardInfoResult.md)
 
 # Creating a key(pair) on the NFC card
 This creates an asymmetric keypair on the NFC card. The private key will never be disclosed and is safely stored in the card. The public key is disclosed. The key can be used as a regular keypair, not using DIDs at all if desired. To access and use the key later you can use the public key value, its card index or the DID Key id value 
@@ -57,18 +53,14 @@ NfcSdk.createKey(cardId, unrevokeable, curve).then(keyInfo => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**cardId** | **String**| The Id of a card | [optional] [default to null]
-**unrevokeable** | **Boolean** | Whether this key can be unrevoked and thus reissued after revocation | [optional] [default to false]
-**curve** | **Curve** |  | [optional] [default to null]
+**cardId**       | **String**                     | The Id of a card                                                     | [optional] [default to null]
+**unrevokeable** | **Boolean**                    | Whether this key can be unrevoked and thus reissued after revocation | [optional] [default to false]
+**curve**        | [**Curve**](src/types/Curve.md) |                                                                      | [optional] [default to null]
 
 
 ### Return type
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**publicKeyMultibase** | **String** | The public key in Multibase Format | [optional] [default to null]
-**index** | **Integer** | The index of the key on the card | [optional] [default to null]
-**status** | **KeyStatus** |  | [optional] [default to null]
+[**KeyResults**](src/main/src/types/KeyResults.md)
 
 # Deactivating Key
 Deactivate a key by card index, public key or DID key
@@ -91,7 +83,6 @@ Name | Type | Description  | Notes
 **keyId** | **String** | The Key index, public key or DID/Verification method key id |
 
 
-
 ### Return type
 
 None
@@ -104,7 +95,7 @@ This method allows you to sign one or more inputs using the private key stored o
 ```
 import NfcSdk from 'gimly-ssi-nfc-react-native';
 
-NfcSdk.sign(cardId, keyId, signRequest).then(signResponse => {
+NfcSdk.signUsingKey(keyId, signRequest, cardId).then(signResponse => {
   // handle sign response
 }).catch(error => {
   // handle error
@@ -116,15 +107,12 @@ NfcSdk.sign(cardId, keyId, signRequest).then(signResponse => {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **keyId** | **String** | The Key index, public key or DID/Verification method key id | [default to null]
+**signRequest** | [**SignRequest**](src/types/SignRequest.md) | Signs one or more inputs, typically hashes in hex format |
 **cardId** | **String** | The Id of a card | [optional] [default to null]
-**signRequest** | **SignRequest** | Signs one or more inputs, typically hashes in hex format |
 
 ### Return type
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**publicKeyMultibase** | **String** | The public key in Multibase Format | [optional] [default to null]
-**signatures** | **Array<Signature>** |  | [optional] [default to null]
+[**SignResponse**]src/main/src/types/SignResponse.md)
 
 
 # Adding a proof to a credential
@@ -133,7 +121,7 @@ This method adds a proof to the supplied credential, using the private key on th
 ```
 import NfcSdk from 'gimly-ssi-nfc-react-native';
 
-NfcSdk.signCredential(cardId, keyId, signCredentialRequest).then(signCredentialResponse => {
+NfcSdk.signCredential(keyId, signCredentialRequest, cardId).then(signCredentialResponse => {
   // handle sign response
 }).catch(error => {
   // handle error
@@ -145,15 +133,12 @@ NfcSdk.signCredential(cardId, keyId, signCredentialRequest).then(signCredentialR
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **keyId** | **String** | The Key index, public key or DID/Verification method key id | [default to null]
+**SignCredentialRequest** | [**SignCredentialRequest**](src/types/SignCredentialRequest.md) | Signs one or more inputs, typically hashes in hex format |
 **cardId** | **String** | The Id of a card | [optional] [default to null]
-**SignCredentialRequest** | **SignCredentialRequest** | Signs one or more inputs, typically hashes in hex format |
 
 ### Return type
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**verifiableCredential** | **Credential** |  | [optional] [default to null]
-**storageId** | **String** | If the credential was stored it returns the id you can use (typically the credential id) | [optional] [default to null]
+[**SignCredentialResponse**](src/main/src/types/SignCredentialResponse.md)
 
 
 # Adding a proof to a presentation
@@ -162,7 +147,7 @@ Sign the supplied presentation using the key on the NFC card, adding a proof and
 ```
 import NfcSdk from 'gimly-ssi-nfc-react-native';
 
-NfcSdk.signPresentation(cardId, keyId, signPresentationRequest).then(signPresentationResponse => {
+NfcSdk.signPresentation(keyId, signPresentationRequest, cardId).then(signPresentationResponse => {
   // handle sign response
 }).catch(error => {
   // handle error
@@ -175,14 +160,12 @@ NfcSdk.signPresentation(cardId, keyId, signPresentationRequest).then(signPresent
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **keyId** | **String** | The Key index, public key or DID/Verification method key id | [default to null]
+**SignPresentationRequest** | [**SignPresentationRequest**](src/types/SignPresentationRequest.md) | Signs a presentation |
 **cardId** | **String** | The Id of a card | [optional] [default to null]
-**SignPresentationRequest** | **SignPresentationRequest** | Signs a presentation |
 
 ### Return type
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**verifiablePresentation** | **VerifiablePresentation** |  | [optional] [default to null]
+[**SignPresentationResponse**](src/main/src/types/SignPresentationResponse.md)
 
 # Get all Verifiable Credentials stored on the NFC card
 Verified Credentials that are self-issued as well as externally issued with a subject that is related to the NFC card, can be stored on the NFC card. This method returns all stored Verifiable Credentials.
@@ -207,9 +190,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**credentials** | **Array<Credential>** |  | [optional] [default to null]
+[**StoredCredentialsResponse**](src/main/src/types/StoredCredentialsResponse.md)
 
 
 # Getting a Verifiable Credential stored on the NFC card
@@ -236,9 +217,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**credentials** | **Array<Credential>** |  | [optional] [default to null]
+[**StoredCredentialsResponse**](src/main/src/types/StoredCredentialsResponse.md)
 
 
 # Deleting a Verifiable Credentials stored on the NFC card
@@ -247,7 +226,7 @@ Verified Credentials that are self-issued as well as externally issued with a su
 ```
 import NfcSdk from 'gimly-ssi-nfc-react-native';
 
-NfcSdk.deleteStoredCredential(cardId, credentialId).then(()) => {
+NfcSdk.deleteStoredCredential(credentialId, cardId).then(()) => {
   // handle success
 }).catch(error => {
   // handle error
@@ -259,8 +238,8 @@ NfcSdk.deleteStoredCredential(cardId, credentialId).then(()) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**cardId** | **String** | The Id of a card | [optional] [default to null]
 **credentialId** | **String** | The Id of a credential | [optional] [default to null]
+**cardId** | **String** | The Id of a card | [optional] [default to null]
 
 
 ### Return type
