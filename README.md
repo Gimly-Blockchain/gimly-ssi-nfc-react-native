@@ -1,331 +1,268 @@
 <h2 style="text-align: center; vertical-align: middle">
     <a href="https://www.gimly.io/"><img src="https://avatars.githubusercontent.com/u/64525639?s=200&v=4" alt="Gimly" width="120" style="vertical-align: middle"></a></h2>
 
-# Ggimly ssi nfc sdk
+# Gimly SSI-NFC SDK
 
-Gimly SDK to manage NFC and SSI communication
+Gimly SSI-NFC SDK is a kit Self Sovereign Identity interactions between react native apps having an NFC reader and NFC cards.
 
-## Pre-requisites
+The SDK is used as an easy integration means for React Native applications equipped with an NFC reader. The SDK is targeted at Self Sovereign Identity and Authentication use cases, meaning it can be used to create asymmetric keys for Decentralized Identifiers, as well as store and present Verifiable Credentials and Verifiable Presentations. Given the private key is securely stored in the NFC cards protected environment, it means the solution provides security for SSI use cases on desktop and terminal environments which typically would not be possible otherwise.
 
-Tangem (https://github.com/tangem/tangem-sdk-react-native)
+The current version of the SDK uses tangem under the hood, which may require additional native changes documented [here](https://developers.tangem.com/getting-started/react-native)
 
-Gimly usses tangem under the hood, which may require aditional native changes documented here
 
-https://developers.tangem.com/getting-started/react-native
-
-## Installation
+# Installation
 
 ```sh
 yarn add gimly-ssi-nfc-react-native
 ```
 
-# Usage
+# Scanning a card
+To start working with the NFC card, you typically have to scan the card first
 
-## Import
-
-Library must be imported like:
-
-```sh
+```
 import NfcSdk from 'gimly-ssi-nfc-react-native';
-```
 
-## Methods
-
-## **getStatus**
-> NfcSdk.getStatus
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-n/a | n/a  | n/a  | n/a
-
-### example
-
-```sh
-NfcSdk.getStatus().then(status => {
-  // handle status here
-})
-```
-
-### Return type
-
-[**status**] status response
-
-## **startSession**
-> NfcSdk.startSession
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-n/a | n/a  | n/a  | n/a
-
-### example
-
-```sh
-NfcSdk.startSession()
-```
-
-### Return type
-
-[**none**] no response
-
-## **nfcListener**
-> NfcSdk.nfcListener
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-n/a | n/a  | n/a  | n/a
-
-### example
-
-```sh
-NfcSdk.nfcListener()
-```
-
-### Return type
-
-[**none**] None
-
-## **removeNfcListener**
-> NfcSdk.removeNfcListener
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**listener** | **nfcListener**| Removes listener previous set | nfcListener must be stored on a variable and passed
-
-### example
-
-```sh
-NfcSdk.removeNfcListener(listener)
-```
-
-### Return type
-
-[**none**] None
-
-## **stopSession**
-> NfcSdk.stopSession
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-n/a | n/a  | Stops current set session  | n/a
-
-### example
-
-```sh
-NfcSdk.stopSession()
-```
-
-### Return type
-
-[**none**] no response
-
-## **scanCard**
-> NfcSdk.scanCard
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-n/a | n/a  | Scans for cards  | n/a
-
-### example
-
-```sh
-NfcSdk.scanCard().then(card => {
-  // handle card
+NfcSdk.scanCard().then(cardInfo => {
+  // handle cardInfo
 }).catch(error => {
   // handle error
 })
 ```
 
-### Return type
-
-[**card**] card response (object)
-
-## **sign**
-> NfcSdk.sign
-
 ### Parameters
+None
 
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**hashes** | **String**| hashes | hashes
-**walletPublicKey** | **String**| walletPublicKey | walletPublicKey
-**cardId** | **String**| cardId | cardId
-**initialMessage** | **String**| initialMessage | initialMessage
+### Return type
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**cardId** | **String** | The card id Id | [default to null]
+**batchId** | **String** | The manufacturing batch id | [optional] [default to null]
+**cardPublicKeyMultibase** | **String** | The card public key | [optional] [default to null]
+**cardInfo** | **CardInfo** |  | [optional] [default to null]
 
-### example
+# Creating a key(pair) on the NFC card
+This creates an asymmetric keypair on the NFC card. The private key will never be disclosed and is safely stored in the card. The public key is disclosed. The key can be used as a regular keypair, not using DIDs at all if desired. To access and use the key later you can use the public key value, its card index or the DID Key id value 
 
-```sh
-NfcSdk.sign(
-  hashes,
-  walletPublicKey,
-  cardId,
-  initialMessage
-).then(response => {
-  // handle response
+```
+import NfcSdk from 'gimly-ssi-nfc-react-native';
+
+NfcSdk.createKey(cardId, unrevokeable, curve).then(keyInfo => {
+  // handle keyInfo
 }).catch(error => {
   // handle error
 })
 ```
 
-### Return type
-
-[**response**] response (object)
-
-## **createWallet**
-> NfcSdk.createWallet
-
 ### Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**cardId** | **String**| Card Identifier | n/a
+**cardId** | **String**| The Id of a card | [optional] [default to null]
+**unrevokeable** | **Boolean** | Whether this key can be unrevoked and thus reissued after revocation | [optional] [default to false]
+**curve** | **Curve** |  | [optional] [default to null]
 
-### example
 
-```sh
-NgcSdk.createWallet(
-  cardId
-).then(response => {
-  // handle response
+### Return type
+
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**publicKeyMultibase** | **String** | The public key in Multibase Format | [optional] [default to null]
+**index** | **Integer** | The index of the key on the card | [optional] [default to null]
+**status** | **KeyStatus** |  | [optional] [default to null]
+
+# Deactivating Key
+Deactivate a key by card index, public key or DID key
+
+```
+import NfcSdk from 'gimly-ssi-nfc-react-native';
+
+NfcSdk.deactiveKey(cardId, keyId).then(() => {
+  // handle success
 }).catch(error => {
   // handle error
 })
 ```
 
-### Return type
-
-[**response**] response (object)
-
-## **purgeWallet**
-> NfcSdk.purgeWallet
-
 ### Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**cardId** | **String**| Card Identifier | n/a
-**walletPublicKey** | **String**| Public key for the wallet | n/a
+**cardId** | **String**| The Id of a card | 
+**keyId** | **String** | The Key index, public key or DID/Verification method key id |
 
-### example
 
-```sh
-NgcSdk.purgeWallet(
-  cardId,
-  walletPublicKey
-).then(response => {
-  // handle response
+
+### Return type
+
+None
+
+
+# Signing using the key on the NFC card
+
+This method allows you to sign one or more inputs using the private key stored on the NFC card. 
+
+```
+import NfcSdk from 'gimly-ssi-nfc-react-native';
+
+NfcSdk.sign(cardId, keyId, signRequest).then(signResponse => {
+  // handle sign response
 }).catch(error => {
   // handle error
 })
 ```
 
-### Return type
-
-[**response**] response (object)
-
-## **setPassCode**
-> NfcSdk.setPassCode
-
 ### Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**cardId** | **String**| Card Identifier | n/
+**keyId** | **String** | The Key index, public key or DID/Verification method key id | [default to null]
+**cardId** | **String** | The Id of a card | [optional] [default to null]
+**signRequest** | **SignRequest** | Signs one or more inputs, typically hashes in hex format |
 
-### example
+### Return type
 
-```sh
-NgcSdk.setPassCode(
-  cardId,
-).then(response => {
-  // handle response
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**publicKeyMultibase** | **String** | The public key in Multibase Format | [optional] [default to null]
+**signatures** | **Array<Signature>** |  | [optional] [default to null]
+
+
+# Adding a proof to a credential
+This method adds a proof to the supplied credential, using the private key on the NFC card and thus making it a Verifiable Credential. It allows for optional storage of the VC on the NFC card.
+
+```
+import NfcSdk from 'gimly-ssi-nfc-react-native';
+
+NfcSdk.signCredential(cardId, keyId, signCredentialRequest).then(signCredentialResponse => {
+  // handle sign response
 }).catch(error => {
   // handle error
 })
 ```
 
-### Return type
-
-[**response**] response (object)
-
-## **setAccessCode**
-> NfcSdk.setAccessCode
-
 ### Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**cardId** | **String**| Card Identifier | n/a
+**keyId** | **String** | The Key index, public key or DID/Verification method key id | [default to null]
+**cardId** | **String** | The Id of a card | [optional] [default to null]
+**SignCredentialRequest** | **SignCredentialRequest** | Signs one or more inputs, typically hashes in hex format |
 
-### example
+### Return type
 
-```sh
-NgcSdk.setAccessCode(
-  cardId,
-).then(response => {
-  // handle response
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**verifiableCredential** | **Credential** |  | [optional] [default to null]
+**storageId** | **String** | If the credential was stored it returns the id you can use (typically the credential id) | [optional] [default to null]
+
+
+# Adding a proof to a presentation
+Sign the supplied presentation using the key on the NFC card, adding a proof and making it a verifiable presentation. Please note that verifiable presentations cannot be stored, as the nature of Verifiable Presentations is to use them on singular invocations only
+
+```
+import NfcSdk from 'gimly-ssi-nfc-react-native';
+
+NfcSdk.signPresentation(cardId, keyId, signPresentationRequest).then(signPresentationResponse => {
+  // handle sign response
 }).catch(error => {
   // handle error
 })
 ```
 
-### Return type
-
-[**response**] response
-
-## **resetUserCodes**
-> NfcSdk.resetUserCodes (object)
 
 ### Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**cardId** | **String**| Card Identifier | n/a
+**keyId** | **String** | The Key index, public key or DID/Verification method key id | [default to null]
+**cardId** | **String** | The Id of a card | [optional] [default to null]
+**SignPresentationRequest** | **SignPresentationRequest** | Signs a presentation |
 
-### example
+### Return type
 
-```sh
-NgcSdk.resetUserCodes(
-  cardId,
-).then(response => {
-  // handle response
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**verifiablePresentation** | **VerifiablePresentation** |  | [optional] [default to null]
+
+# Get all Verifiable Credentials stored on the NFC card
+Verified Credentials that are self-issued as well as externally issued with a subject that is related to the NFC card, can be stored on the NFC card. This method returns all stored Verifiable Credentials.
+
+```
+import NfcSdk from 'gimly-ssi-nfc-react-native';
+
+NfcSdk.getStoredCredentials(cardId).then(credentials => {
+  // handle credentials
 }).catch(error => {
   // handle error
 })
 ```
 
-### Return type
-
-[**response**] response (object)
-
-## **NfcSdkModule**
-> NfcSdkModule[command]
 
 ### Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**command** | **String**| to directly launch a Tangem command | n/a
+**cardId** | **String**| The Id of a card | [optional] [default to null]
 
-### example
-
-```sh
-import { NfcSdkModule } from "react-native-gimly-ssi-nfc-sdk"; // to directly launch a Tangem command
-
-NfcSdkModule[command]
-```
 
 ### Return type
 
-[**response**] response (could change, please see desired command at Tangem)
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**credentials** | **Array<Credential>** |  | [optional] [default to null]
+
+
+# Getting a Verifiable Credential stored on the NFC card
+Verified Credentials that are self-issued as well as externally issued with a subject that is related to the NFC card, can be stored on the NFC card. This method returns a specific stored Verifiable Credential.
+
+```
+import NfcSdk from 'gimly-ssi-nfc-react-native';
+
+NfcSdk.getStoredCredential(cardId, credentialId).then(credentials => {
+  // handle credentials
+}).catch(error => {
+  // handle error
+})
+```
+
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**cardId** | **String** | The Id of a card | [optional] [default to null]
+**credentialId** | **String** | The Id of a credential | [optional] [default to null]
+
+
+### Return type
+
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**credentials** | **Array<Credential>** |  | [optional] [default to null]
+
+
+# Deleting a Verifiable Credentials stored on the NFC card
+Verified Credentials that are self-issued as well as externally issued with a subject that related to the NFC card, can be stored on the NFC card. This method delete a specific stored Verifiable Credential.
+
+```
+import NfcSdk from 'gimly-ssi-nfc-react-native';
+
+NfcSdk.deleteStoredCredential(cardId, credentialId).then(()) => {
+  // handle success
+}).catch(error => {
+  // handle error
+})
+```
+
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**cardId** | **String** | The Id of a card | [optional] [default to null]
+**credentialId** | **String** | The Id of a credential | [optional] [default to null]
+
+
+### Return type
+
+None
