@@ -88,6 +88,58 @@ Name | Type | Description  | Notes
 None
 
 
+# Get Keys
+Gets all keys by card id
+
+```
+import NfcSdk from 'gimly-ssi-nfc-react-native';
+
+NfcSdk.getKeys(initialMessage, cardId).then(() => {
+  // handle success
+}).catch(error => {
+  // handle error
+})
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**initialMessage** | **String** | The message to display |
+**cardId** | **String**| The Id of a card | 
+
+
+### Return type
+
+[**KeyResults**]src/main/src/types/KeyResults.md)
+
+
+# Get single Key
+Gets a key by card id and keyId
+
+```
+import NfcSdk from 'gimly-ssi-nfc-react-native';
+
+NfcSdk.getKey(initialMessage, cardId, keyId).then(() => {
+  // handle success
+}).catch(error => {
+  // handle error
+})
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**initialMessage** | **String** | The message to display |
+**cardId** | **String**| The Id of a card | 
+**keyId** | **String**| The Id of a key | 
+
+### Return type
+
+[**KeyInfo**]src/main/src/types/KeyInfo.md)
+
+
 # Signing using the key on the NFC card
 
 This method allows you to sign one or more inputs using the private key stored on the NFC card. 
@@ -226,7 +278,7 @@ Verified Credentials that are self-issued as well as externally issued with a su
 ```
 import NfcSdk from 'gimly-ssi-nfc-react-native';
 
-NfcSdk.deleteStoredCredential(credentialId, cardId).then(()) => {
+NfcSdk.deleteStoredCredential(credentialId, cardId).then(() => {
   // handle success
 }).catch(error => {
   // handle error
@@ -245,3 +297,74 @@ Name | Type | Description  | Notes
 ### Return type
 
 None
+
+
+# Set Access Code
+If Access code is set on the card, all commands, including Scan Card, will require to sumbit this code. So if the Access code is lost, there is no way to recover the data or even retrieve the public key. Access codes may be enabled or disabled during card configuration at the factory. Also, it’s possible to prohibit removing the access code from the card once it’s set.
+
+```
+import NfcSdk from 'gimly-ssi-nfc-react-native';
+
+NfcSdk.setAccessCode(accessCode, cardId).then(credentials => {
+  // handle response
+}).catch(error => {
+  // handle error
+})
+```
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**accessCode** | **String**   | The access code  |
+**cardId**     | **String**   | The Id of a card |
+
+### Return type
+
+[**SuccessResponse**](src/main/src/types/SuccessResponse.md)
+
+
+# Set Pass Code
+Passcode protects signing and operations that can alter security parameters. Passcode may be enabled or disabled during card configuration at the factory. Also, it’s possible to prohibit removing the passcode from the card once it’s set.
+
+```
+import NfcSdk from 'gimly-ssi-nfc-react-native';
+
+NfcSdk.setPasscode(passcode, cardId).then(credentials => {
+  // handle response
+}).catch(error => {
+  // handle error
+})
+```
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**passcode** | **String**   | The pass code  |
+**cardId**     | **String**   | The Id of a card |
+
+### Return type
+
+[**SuccessResponse**](src/main/src/types/SuccessResponse.md)
+
+
+# Reset User Codes
+Reset both access code and passcode if they were set.
+
+```
+import NfcSdk from 'gimly-ssi-nfc-react-native';
+
+NfcSdk.resetUserCodes(cardId).then(credentials => {
+  // handle response
+}).catch(error => {
+  // handle error
+})
+```
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**cardId**     | **String**   | The Id of a card |
+
+### Return type
+
+[**SuccessResponse**](src/main/src/types/SuccessResponse.md)
