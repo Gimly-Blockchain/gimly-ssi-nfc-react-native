@@ -6,5 +6,5 @@ export type CardInfoResult = {
   batchId: String,
   cardPublicKeyMultibase: String,
   cardInfo: CardInfo,
-  linkedTerminal: LinkedTerminal,
+  // linkedTerminal: LinkedTerminal, TODO: this prop is not required on RN
 };

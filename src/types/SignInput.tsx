@@ -1,5 +1,5 @@
 
 export type SignInput = {
-  data: String,
+  data: string,
   encoding: {}
 };

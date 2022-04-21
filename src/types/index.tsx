@@ -21,3 +21,5 @@ export * from './SignResponse';
 export * from './SignOutputFromInput';
 export * from './SignOutput';
 export * from './StoredCredentialsResponse';
+export * from './Credential';
+export * from './StoredCredentialResponse';
