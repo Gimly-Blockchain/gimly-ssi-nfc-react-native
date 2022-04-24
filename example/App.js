@@ -1,6 +1,6 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
+ * Sample React Native App for Gimly
+ * https://gimly.io
  *
  * @format
  * @flow strict-local
@@ -18,8 +18,7 @@ import {
   Button,
 } from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-//import NfcSdk from 'gimly-ssi-nfc-react-native';
-import NfcSdk from '../src';
+import NfcSdk from '../src'; //import NfcSdk from 'gimly-ssi-nfc-react-native';
 
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -39,6 +38,7 @@ const App = () => {
 
   const test_scanCard = () => {
     console.log('TEST scanCard');
+
     NfcSdk.scanCard()
       .then(response => {
         console.log('response', JSON.stringify(response));
@@ -52,8 +52,10 @@ const App = () => {
 
   const test_createKey = () => {
     console.log('TEST createKey');
+
     const unrevokeable = false;
     const curve = cardInformation.cardInfo.curves[0];
+
     NfcSdk.createKey(cardId, unrevokeable, curve)
       .then(response => {
         console.log('response', JSON.stringify(response));
@@ -66,6 +68,7 @@ const App = () => {
 
   const test_deactiveKey = () => {
     console.log('TEST deactiveKey');
+
     NfcSdk.deactiveKey(cardId, keyId)
       .then(() => {
         console.log('deactiveKey done');
@@ -77,10 +80,12 @@ const App = () => {
 
   const test_getKey = () => {
     console.log('TEST getKey');
+
     const initialMessage = '';
     const keyId =
       '02EE0265FB7B23F19739CD9706E332209E28BB10C046DB0F984DF24A8B877BCA40';
-    NfcSdk.getKey(initialMessage, cardId, keyId)
+
+      NfcSdk.getKey(initialMessage, cardId, keyId)
       .then(response => {
         console.log('response', JSON.stringify(response));
       })
@@ -91,7 +96,9 @@ const App = () => {
 
   const test_getKeys = () => {
     console.log('TEST getKeys');
+
     const initialMessage = '';
+
     NfcSdk.getKeys(initialMessage, cardId)
       .then(response => {
         console.log('response', JSON.stringify(response));
@@ -102,6 +109,7 @@ const App = () => {
   };
 
   const test_signUsingKey = () => {
+
     console.log('TEST signUsingKey');
 
     const keyId =
@@ -179,6 +187,7 @@ const App = () => {
 
   const test_signPresentation = () => {
     console.log('TEST signPresentation');
+
     const signPresentationRequest = null;
     const keyId =
       '02EE0265FB7B23F19739CD9706E332209E28BB10C046DB0F984DF24A8B877BCA40';
@@ -194,7 +203,9 @@ const App = () => {
 
   const test_deleteStoredCredential = () => {
     console.log('TEST deleteStoredCredential');
-    const credentialId = '';
+    
+    const credentialId = '123456';
+
     NfcSdk.deleteStoredCredential(credentialId, cardId)
       .then(() => {
         console.log('deleteStoredCredential done');
@@ -206,6 +217,7 @@ const App = () => {
 
   const test_getStoredCredentials = () => {
     console.log('TEST getStoredCredentials');
+
     NfcSdk.getStoredCredentials(cardId)
       .then(response => {
         console.log('response', JSON.stringify(response));
@@ -217,7 +229,9 @@ const App = () => {
 
   const test_getStoredCredential = () => {
     console.log('TEST getStoredCredential');
+
     const credentialId = '';
+
     NfcSdk.getStoredCredential(cardId, credentialId)
       .then(response => {
         console.log('response', JSON.stringify(response));
