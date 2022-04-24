@@ -300,7 +300,7 @@ None
 
 
 # Set Access Code
-If Access code is set on the card, all commands, including Scan Card, will require to sumbit this code. So if the Access code is lost, there is no way to recover the data or even retrieve the public key. Access codes may be enabled or disabled during card configuration at the factory. Also, it’s possible to prohibit removing the access code from the card once it’s set.
+If an Access code is set on the card, all commands, including Scan Card, will require to submit this code. So if the Access code is lost, there is no way to recover the data or even retrieve the public key. Access codes may be enabled or disabled during card configuration at the factory. Also, it’s possible to prohibit removing the access code from the card once it’s set.
 
 ```
 import NfcSdk from 'gimly-ssi-nfc-react-native';
@@ -324,7 +324,7 @@ Name | Type | Description  | Notes
 
 
 # Set Pass Code
-Passcode protects signing and operations that can alter security parameters. Passcode may be enabled or disabled during card configuration at the factory. Also, it’s possible to prohibit removing the passcode from the card once it’s set.
+Passcode protects signing and operations that can alter security parameters. The passcode may be enabled or disabled during card configuration at the factory. Also, it’s possible to prohibit removing the passcode from the card once it’s set.
 
 ```
 import NfcSdk from 'gimly-ssi-nfc-react-native';
@@ -359,6 +359,7 @@ NfcSdk.resetUserCodes(cardId).then(credentials => {
   // handle error
 })
 ```
+
 ### Parameters
 
 Name | Type | Description  | Notes
