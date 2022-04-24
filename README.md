@@ -7,7 +7,7 @@ Gimly SSI-NFC SDK is a kit Self Sovereign Identity interactions between react na
 
 The SDK is used as an easy integration means for React Native applications equipped with an NFC reader. The SDK is targeted at Self Sovereign Identity and Authentication use cases, meaning it can be used to create asymmetric keys for Decentralized Identifiers, as well as store and present Verifiable Credentials and Verifiable Presentations. Given the private key is securely stored in the NFC cards protected environment, it means the solution provides security for SSI use cases on desktop and terminal environments which typically would not be possible otherwise.
 
-The current version of the SDK uses tangem under the hood, which may require additional native changes documented [here](https://developers.tangem.com/getting-started/react-native)
+The current version of the SDK uses Tangem under the hood, which may require additional native changes documented [here](https://developers.tangem.com/getting-started/react-native)
 
 
 # Installation
@@ -53,9 +53,9 @@ NfcSdk.createKey(cardId, unrevokeable, curve).then(keyInfo => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**cardId**       | **String**                     | The Id of a card                                                     | [optional] [default to null]
-**unrevokeable** | **Boolean**                    | Whether this key can be unrevoked and thus reissued after revocation | [optional] [default to false]
-**curve**        | [**Curve**](src/types/Curve.md) |                                                                      | [optional] [default to null]
+**cardId**       | **String**                     | The Id of a card                                                     | Optional. Default to null.
+**unrevokeable** | **Boolean**                    | Whether this key can be unrevoked and thus reissued after revocation | Optional. [default to false]
+**curve**        | [**Curve**](src/types/Curve.md) |                                                                      | Optional. Default to null.
 
 
 ### Return type
@@ -111,7 +111,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**KeyResults**]src/main/src/types/KeyResults.md)
+[**KeyResults**](src/main/src/types/KeyResults.md)
 
 
 # Get single Key
@@ -137,7 +137,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**KeyInfo**]src/main/src/types/KeyInfo.md)
+[**KeyInfo**](src/main/src/types/KeyInfo.md)
 
 
 # Signing using the key on the NFC card
@@ -158,13 +158,13 @@ NfcSdk.signUsingKey(keyId, signRequest, cardId).then(signResponse => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**keyId** | **String** | The Key index, public key or DID/Verification method key id | [default to null]
+**keyId** | **String** | The Key index, public key or DID/Verification method key id | Default to null.
 **signRequest** | [**SignRequest**](src/types/SignRequest.md) | Signs one or more inputs, typically hashes in hex format |
-**cardId** | **String** | The Id of a card | [optional] [default to null]
+**cardId** | **String** | The Id of a card | Optional. Default to null.
 
 ### Return type
 
-[**SignResponse**]src/main/src/types/SignResponse.md)
+[**SignResponse**](src/main/src/types/SignResponse.md)
 
 
 # Adding a proof to a credential
@@ -184,9 +184,9 @@ NfcSdk.signCredential(keyId, signCredentialRequest, cardId).then(signCredentialR
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**keyId** | **String** | The Key index, public key or DID/Verification method key id | [default to null]
+**keyId** | **String** | The Key index, public key or DID/Verification method key id | Default to null.
 **SignCredentialRequest** | [**SignCredentialRequest**](src/types/SignCredentialRequest.md) | Signs one or more inputs, typically hashes in hex format |
-**cardId** | **String** | The Id of a card | [optional] [default to null]
+**cardId** | **String** | The Id of a card | Optional. Default to null.
 
 ### Return type
 
@@ -211,9 +211,9 @@ NfcSdk.signPresentation(keyId, signPresentationRequest, cardId).then(signPresent
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**keyId** | **String** | The Key index, public key or DID/Verification method key id | [default to null]
+**keyId** | **String** | The Key index, public key or DID/Verification method key id | Default to null.
 **SignPresentationRequest** | [**SignPresentationRequest**](src/types/SignPresentationRequest.md) | Signs a presentation |
-**cardId** | **String** | The Id of a card | [optional] [default to null]
+**cardId** | **String** | The Id of a card | Optional. Default to null.
 
 ### Return type
 
@@ -237,7 +237,7 @@ NfcSdk.getStoredCredentials(cardId).then(credentials => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**cardId** | **String**| The Id of a card | [optional] [default to null]
+**cardId** | **String**| The Id of a card | Optional. Default to null.
 
 
 ### Return type
@@ -263,8 +263,8 @@ NfcSdk.getStoredCredential(cardId, credentialId).then(credentials => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**cardId** | **String** | The Id of a card | [optional] [default to null]
-**credentialId** | **String** | The Id of a credential | [optional] [default to null]
+**cardId** | **String** | The Id of a card | Optional. Default to null.
+**credentialId** | **String** | The Id of a credential | Optional. Default to null.
 
 
 ### Return type
@@ -290,8 +290,8 @@ NfcSdk.deleteStoredCredential(credentialId, cardId).then(() => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**credentialId** | **String** | The Id of a credential | [optional] [default to null]
-**cardId** | **String** | The Id of a card | [optional] [default to null]
+**credentialId** | **String** | The Id of a credential | Optional. Default to null.
+**cardId** | **String** | The Id of a card | Optional. Default to null.
 
 
 ### Return type
