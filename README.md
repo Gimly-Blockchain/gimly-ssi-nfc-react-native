@@ -60,7 +60,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**KeyResults**](src/main/src/types/KeyResults.md)
+[**KeyResults**](src/types/KeyResults.md)
 
 # Deactivating Key
 Deactivate a key by card index, public key or DID key
@@ -111,7 +111,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**KeyResults**](src/main/src/types/KeyResults.md)
+[**KeyResults**](src/types/KeyResults.md)
 
 
 # Get single Key
@@ -137,7 +137,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**KeyInfo**](src/main/src/types/KeyInfo.md)
+[**KeyInfo**](src/types/KeyInfo.md)
 
 
 # Signing using the key on the NFC card
@@ -164,7 +164,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**SignResponse**](src/main/src/types/SignResponse.md)
+[**SignResponse**](src/types/SignResponse.md)
 
 
 # Adding a proof to a credential
@@ -190,7 +190,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**SignCredentialResponse**](src/main/src/types/SignCredentialResponse.md)
+[**SignCredentialResponse**](src/types/SignCredentialResponse.md)
 
 
 # Adding a proof to a presentation
@@ -217,7 +217,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**SignPresentationResponse**](src/main/src/types/SignPresentationResponse.md)
+[**SignPresentationResponse**](src/types/SignPresentationResponse.md)
 
 # Get all Verifiable Credentials stored on the NFC card
 Verified Credentials that are self-issued as well as externally issued with a subject that is related to the NFC card, can be stored on the NFC card. This method returns all stored Verifiable Credentials.
@@ -242,7 +242,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**StoredCredentialsResponse**](src/main/src/types/StoredCredentialsResponse.md)
+[**StoredCredentialsResponse**](src/types/StoredCredentialsResponse.md)
 
 
 # Getting a Verifiable Credential stored on the NFC card
@@ -269,7 +269,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**StoredCredentialsResponse**](src/main/src/types/StoredCredentialsResponse.md)
+[**StoredCredentialsResponse**](src/types/StoredCredentialsResponse.md)
 
 
 # Deleting a Verifiable Credentials stored on the NFC card
@@ -320,7 +320,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**SuccessResponse**](src/main/src/types/SuccessResponse.md)
+[**SuccessResponse**](src/types/SuccessResponse.md)
 
 
 # Set Pass Code
@@ -344,7 +344,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**SuccessResponse**](src/main/src/types/SuccessResponse.md)
+[**SuccessResponse**](src/types/SuccessResponse.md)
 
 
 # Reset User Codes
@@ -368,4 +368,4 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**SuccessResponse**](src/main/src/types/SuccessResponse.md)
+[**SuccessResponse**](src/types/SuccessResponse.md)
