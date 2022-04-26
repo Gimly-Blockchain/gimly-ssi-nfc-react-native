@@ -1,4 +1,4 @@
-import type { CredentialSubject, CredentialStatus } from './index'
+import type { CredentialSubject, CredentialStatus, Proof } from './index'
 
 export type Credential = {
   "@context": string[],
@@ -9,11 +9,5 @@ export type Credential = {
   issuanceDate: string,
   expirationDate: string,
   credentialStatus: CredentialStatus,
-  proof: { // TODO: added becouse test was ussing this parameter
-    type: string;
-    created: string;
-    verificationMethod: string;
-    proofPurpose: string;
-    jws: string;
-  }
+  proof: Proof // TODO: added becouse test was ussing this parameter
 };

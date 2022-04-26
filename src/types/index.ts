@@ -23,3 +23,4 @@ export * from './SignOutput';
 export * from './StoredCredentialsResponse';
 export * from './Credential';
 export * from './StoredCredentialResponse';
+export * from './VerifiablePresentation';

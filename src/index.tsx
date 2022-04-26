@@ -267,7 +267,9 @@ export default class NfcSdk {
     signPresentationRequest: SignPresentationRequest,
     cardId: string,
   ): Promise<SignPresentationResponse> {
-    const verifiableCredential: VerifiableCredential = {
+
+    // TODO: Following code are hardcoded responses, expected as terminal api structure.
+    const verifiableCredential_1: VerifiableCredential = {
       issuanceDate: '',
       proof: {
         type: '',
@@ -284,9 +286,21 @@ export default class NfcSdk {
       expirationDate: '',
       credentialStatus: {id: '', type: ''},
     };
-    return {
-      verifiableCredential,
-    };
+    const response:SignPresentationResponse = {
+      verifiablePresentation: {
+        proof: {
+          type: '',
+          created: '',
+          proofPurpose: '',
+          verificationMethod: '',
+          jws: '',
+        },
+        "@context": [],
+        type: "",
+        verifiableCredential: [verifiableCredential_1],
+      }
+    }
+    return response;
   }
 
   /**
@@ -302,7 +316,7 @@ export default class NfcSdk {
   ): Promise<SuccessResponse | null> {
     // TODO: as first parameter deleteFiles espects "indicesToDelete" which is an array of numbers. Investigate or ask correlation between credentialId(string) <-> indicesToDelete(array of numbers)
     // TODO: dummy const to bypass tsx errors
-    const indicesToDelete: number[] = [];
+    const indicesToDelete: number[] = []; // Indexes of files that should be deleted. If undefined - deletes all files from card
 
     return await TangemSdk.deleteFiles(indicesToDelete, cardId)
       .then(response => {
@@ -325,10 +339,35 @@ export default class NfcSdk {
     const readPrivateFiles: boolean = true;
     const indices = undefined;
     const data = await TangemSdk.readFiles(readPrivateFiles, indices, cardId);
-    // TODO convert data to credentials
-    return {
-      credentials: [],
-    };
+    console.log(data);
+    // TODO: convert data to credentials as expected by terminal format
+    const response: StoredCredentialsResponse = {
+      credentials: [
+        {
+          "@context": [""],
+          id: "",
+          type: [""],
+          credentialSubject: {
+            id: ""
+          },
+          issuer: "",
+          issuanceDate: "",
+          expirationDate: "",
+          credentialStatus: {
+            id: "",
+            type: "",
+          },
+          proof: {
+            type: "",
+            created: "",
+            verificationMethod: "",
+            proofPurpose: "",
+            jws: ""
+          }
+        }
+      ]
+    }
+    return response;
   }
 
   /**
@@ -343,16 +382,12 @@ export default class NfcSdk {
     credentialId: string,
   ): Promise<StoredCredentialResponse|null> {
     const data = await this.getStoredCredentials(cardId);
-
     const filtered = data.credentials.filter(
       credential => credential.id === credentialId,
     );
-
     if (filtered.length === 0) {
-      // TODO: review what is the best response when we can't find any key
       return null;
     }
-
     return {
       credential: filtered[0],
     };

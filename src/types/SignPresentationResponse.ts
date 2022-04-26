@@ -1,5 +1,5 @@
-import type { VerifiableCredential } from './index';
+import type { VerifiablePresentation } from './index';
 
 export type SignPresentationResponse = {
-  verifiableCredential: VerifiableCredential,
+  verifiablePresentation: VerifiablePresentation,
 };
