@@ -28,7 +28,7 @@ export const NfcSdkModule = TangemSdk;
 export default class NfcSdk {
 
   /**
-   * To start working with the NFC card, you typically have to scan the card first
+   * Scan the NFC card
    *
    * @param initialMessage The message to display
    * @returns The card information retrieved with the scan
@@ -72,7 +72,7 @@ export default class NfcSdk {
   }
 
   /**
-   * This creates an asymmetric keypair on the NFC card.
+   * Create an asymmetric keypair on the NFC card
    *
    * @param cardId The Id of a card
    * @param unrevokeable Whether this key can be unrevoked and thus reissued after revocation
@@ -105,10 +105,10 @@ export default class NfcSdk {
   }
 
   /**
-   * Deactivate a key by card index, public key or DID key
+   * Deactivate a key by card index, public key, or DID key
    *
    * @param cardId The Id of a card
-   * @param keyId The Key index, public key or DID/Verification method key id
+   * @param keyId The Key index, public key, or DID/Verification method Key ID
    * @returns null
    */
   public static async deactiveKey(
@@ -124,7 +124,7 @@ export default class NfcSdk {
   }
 
   /**
-   * Gets all keys by card id
+   * Get all keys by card Id
    *
    * @param initialMessage The message to display
    * @param cardId The Id of a card
@@ -156,7 +156,7 @@ export default class NfcSdk {
   }
 
   /**
-   * Gets a key by card id and keyId
+   * Get a key by Card Id and keyId
    *
    * @param initialMessage The message to display
    * @param cardId The Id of a card
@@ -192,12 +192,12 @@ export default class NfcSdk {
   }
 
   /**
-   * This method allows you to sign one or more inputs using the private key stored on the NFC card.
+   * Sign one or more inputs using the private key stored on the NFC card
    *
    * @param keyId The Id of a key
-   * @param signRequest Signs one or more inputs, typically hashes in hex format
+   * @param signRequest Sign one or more inputs, typically hashes in hex format
    * @param cardId The Id of a card
-   * @returns A success response after signing
+   * @returns A successful response after signing or an error
    */
   public static async signUsingKey(
     keyId: string,
@@ -233,7 +233,7 @@ export default class NfcSdk {
   }
 
   /**
-   * This method adds a proof to the supplied credential, using the private key on the NFC card and thus making it a Verifiable Credential. It allows for optional storage of the VC on the NFC card.
+   * Add a proof to the supplied credential, using the private key on the NFC card and thus making it a Verifiable Credential. It allows for optional storage of the VC on the NFC card
    *
    * @param keyId The Id of a key
    * @param signCredentialRequest Signs one or more inputs, typically hashes in hex format
@@ -259,12 +259,12 @@ export default class NfcSdk {
   }
 
   /**
-   * Sign the supplied presentation using the key on the NFC card, adding a proof and making it a verifiable presentation.
+   * Sign the supplied presentation using the key on the NFC card, adding a proof and making it a verifiable presentation
    *
    * @param keyId The Id of a key
    * @param signPresentationRequest Signs a presentation
    * @param cardId The Id of a card
-   * @returns A success response after signing
+   * @returns A successful response after signing
    */
   public static async signPresentation(
     keyId: string,
@@ -294,11 +294,11 @@ export default class NfcSdk {
   }
 
   /**
-   * This method delete a specific stored Verifiable Credential.
+   * Delete a specific stored Verifiable Credential
    *
    * @param credentialId The Id of a credential
-   * @param cardId  The Id of a card
-   * @returns A success response or null
+   * @param cardId The Id of a card
+   * @returns A successful response or null
    */
   public static async deleteStoredCredential(
     credentialId: string,
@@ -318,7 +318,7 @@ export default class NfcSdk {
   }
 
   /**
-   * This method returns all stored Verifiable Credentials.
+   * Return all the stored Verifiable Credentials
    *
    * @param cardId The Id of a card
    * @returns The stored credentials
@@ -336,7 +336,7 @@ export default class NfcSdk {
   }
 
   /**
-   * This method returns a specific stored Verifiable Credential.
+   * Return a specific stored Verifiable Credential
    *
    * @param cardId The Id of a card
    * @param credentialId  The Id of a credential
@@ -363,7 +363,7 @@ export default class NfcSdk {
   }
 
   /**
-   * Sets an access code on the card, if set all commands, including Scan Card, will require to submit this code
+   * Set an access code on the card, if set all commands, including Scan Card, will require to submit this code
    *
    * @param accessCode The access code
    * @param cardId The Id of a card
@@ -381,7 +381,7 @@ export default class NfcSdk {
   }
 
   /**
-   * Sets a passcode. Passcode protects signing and operations that can alter security parameters.
+   * Set a passcode. Passcode protects signing and operations that can alter security parameters
    *
    * @param passcode The pass code
    * @param cardId The Id of a card
@@ -399,7 +399,7 @@ export default class NfcSdk {
   }
 
   /**
-   * Reset both access code and passcode if they were set.
+   * Reset both access code and passcode if they were set
    *
    * @param cardId The Id of a card
    * @returns A success response or null
