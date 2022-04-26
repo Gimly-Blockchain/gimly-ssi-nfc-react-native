@@ -62,8 +62,7 @@ export default class NfcSdk {
       cardId,
       batchId,
       cardPublicKeyMultibase,
-      cardInfo,
-      // linkedTerminal --> TODO: this prop is not required on RN
+      cardInfo
     };
 
     // response = {"cardId":"AC79000000000004","batchId":"AC79000000000004","cardPublicKeyMultibase":"0297B5F98CFC498457778B7999F2B7BFEC6480D6A3DE4E0531CD8223C048AF751D","cardInfo":{"curves":["secp256k1","ed25519","secp256r1"],"firmwareVersion":{"minor":52,"patch":0,"major":4,"stringValue":"4.52d SDK","type":"d SDK"}}}
@@ -75,24 +74,21 @@ export default class NfcSdk {
    * Create an asymmetric keypair on the NFC card
    *
    * @param cardId The Id of a card
-   * @param unrevokeable Whether this key can be unrevoked and thus reissued after revocation
    * @param curve A string with the elliptic Curve
    * @returns The results of the created key
    */
   public static async createKey(
     cardId: string,
-    unrevokeable: boolean, // ---> TODO: we're not using this prop here and the terminal api
     curve: EllipticCurve,
   ): Promise<KeyResults> {
-    // params = secp256k1 false AC79000000000004
+    // params = secp256k1 AC79000000000004
 
     const data = await TangemSdk.createWallet(curve, cardId);
     // data = {"cardId":"AC79000000000004","wallet":{"totalSignedHashes":0,"index":8,"hasBackup":false,"derivedKeys":[],"curve":"secp256k1","publicKey":"037C58B433A9063575C12232A0763DCC09423C8180E977AE9F8C527F462DBC4B5C","chainCode":"CB2C5D06D739E6D42321A8E456B3DF2E70308ECE75DF6EAE830D4D0B2B3F887B","settings":{"isPermanent":false}}}
 
     const keyInfo: KeyInfo = {
       publicKeyMultibase: data.wallet.publicKey,
-      index: data.wallet.index,
-      // status: '??', ---> TODO: we're not using this prop here and the terminal api
+      index: data.wallet.index
     };
 
     const response: KeyResults = {

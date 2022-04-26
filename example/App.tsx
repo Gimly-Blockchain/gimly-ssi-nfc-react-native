@@ -90,10 +90,9 @@ const App = () => {
     console.log('TEST createKey');
     addLog('createKey', 'No params', 'IN');
 
-    const unrevokeable = false;
     const curve = cardInformation.cardInfo.curves[0];
 
-    NfcSdk.createKey(cardId, unrevokeable, curve)
+    NfcSdk.createKey(cardId, curve)
       .then(response => {
         console.log('response', JSON.stringify(response));
         keyId = response.keys[0].publicKeyMultibase; // TODO:  changed according to docummentation to: publicKeyMultibase;

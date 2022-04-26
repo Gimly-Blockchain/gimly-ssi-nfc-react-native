@@ -42,7 +42,7 @@ This creates an asymmetric keypair on the NFC card. The private key will never b
 ```
 import NfcSdk from 'gimly-ssi-nfc-react-native';
 
-NfcSdk.createKey(cardId, unrevokeable, curve).then(keyInfo => {
+NfcSdk.createKey(cardId, curve).then(keyInfo => {
   // handle keyInfo
 }).catch(error => {
   // handle error
@@ -54,7 +54,6 @@ NfcSdk.createKey(cardId, unrevokeable, curve).then(keyInfo => {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **cardId**       | **String**                     | The Id of a card                                                     | Optional. Default to null.
-**unrevokeable** | **Boolean**                    | Whether this key can be unrevoked and thus reissued after revocation | Optional. [default to false]
 **curve**        | [**Curve**](src/types/Curve.md) |                                                                      | Optional. Default to null.
 
 

@@ -3,7 +3,6 @@ export * from './CardInfo';
 export * from './CardInfoResult';
 export * from './Curve';
 export * from './FirmwareVersion';
-export * from './LinkedTerminal';
 export * from './KeyResults';
 export * from './KeyInfo';
 export * from './SignResult';
