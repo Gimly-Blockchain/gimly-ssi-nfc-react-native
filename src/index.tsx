@@ -26,6 +26,13 @@ import type {
 export const NfcSdkModule = TangemSdk;
 
 export default class NfcSdk {
+
+  /**
+   * To start working with the NFC card, you typically have to scan the card first
+   *
+   * @param initialMessage The message to display
+   * @returns The card information retrieved with the scan
+   */
   public static async scanCard(
     initialMessage?: Message,
   ): Promise<CardInfoResult> {
@@ -64,6 +71,14 @@ export default class NfcSdk {
     return response;
   }
 
+  /**
+   * This creates an asymmetric keypair on the NFC card.
+   *
+   * @param cardId The Id of a card
+   * @param unrevokeable Whether this key can be unrevoked and thus reissued after revocation
+   * @param curve A string with the elliptic Curve
+   * @returns The results of the created key
+   */
   public static async createKey(
     cardId: string,
     unrevokeable: boolean, // ---> TODO: we're not using this prop here and the terminal api
@@ -89,6 +104,13 @@ export default class NfcSdk {
     return response;
   }
 
+  /**
+   * Deactivate a key by card index, public key or DID key
+   *
+   * @param cardId The Id of a card
+   * @param keyId The Key index, public key or DID/Verification method key id
+   * @returns null
+   */
   public static async deactiveKey(
     cardId: string,
     keyId: string,
@@ -101,6 +123,13 @@ export default class NfcSdk {
     return null; // TODO Check the method response on the terminal API
   }
 
+  /**
+   * Gets all keys by card id
+   *
+   * @param initialMessage The message to display
+   * @param cardId The Id of a card
+   * @returns The keys retrieved from the card
+   */
   public static async getKeys(
     initialMessage: Message, //TODO the initialMessage key is not defined on the Terminal API
     cardId?: string,
@@ -126,11 +155,19 @@ export default class NfcSdk {
     return response;
   }
 
+  /**
+   * Gets a key by card id and keyId
+   *
+   * @param initialMessage The message to display
+   * @param cardId The Id of a card
+   * @param keyId The Id of a key
+   * @returns The key retrieved from the card
+   */
   public static async getKey(
     initialMessage: Message,
     cardId: string,
     keyId: string,
-  ): Promise<KeyInfo> {
+  ): Promise<KeyInfo|null> {
     // params = '', AC79000000000004, 02EE0265FB7B23F19739CD9706E332209E28BB10C046DB0F984DF24A8B877BCA40
 
     const keyResult: KeyResults = await this.getKeys(initialMessage, cardId);
@@ -154,6 +191,14 @@ export default class NfcSdk {
     return keyInfo;
   }
 
+  /**
+   * This method allows you to sign one or more inputs using the private key stored on the NFC card.
+   *
+   * @param keyId The Id of a key
+   * @param signRequest Signs one or more inputs, typically hashes in hex format
+   * @param cardId The Id of a card
+   * @returns A success response after signing
+   */
   public static async signUsingKey(
     keyId: string,
     signRequest: SignRequest,
@@ -187,11 +232,19 @@ export default class NfcSdk {
     return response;
   }
 
+  /**
+   * This method adds a proof to the supplied credential, using the private key on the NFC card and thus making it a Verifiable Credential. It allows for optional storage of the VC on the NFC card.
+   *
+   * @param keyId The Id of a key
+   * @param signCredentialRequest Signs one or more inputs, typically hashes in hex format
+   * @param cardId The Id of a card
+   * @returns A success response after signing
+   */
   public static async signCredential(
     keyId: string,
     signCredentialRequest: SignCredentialRequest,
     cardId: string,
-  ): Promise<SignCredentialResponse> {
+  ): Promise<SignCredentialResponse|null> {
     console.log(keyId, signCredentialRequest, cardId);
 
     // TODO we have to sign the credential and store it if that is requested. Not sure how to convert that VC to a hash in hex format, so we can use the sign method.
@@ -205,6 +258,14 @@ export default class NfcSdk {
     return null;
   }
 
+  /**
+   * Sign the supplied presentation using the key on the NFC card, adding a proof and making it a verifiable presentation.
+   *
+   * @param keyId The Id of a key
+   * @param signPresentationRequest Signs a presentation
+   * @param cardId The Id of a card
+   * @returns A success response after signing
+   */
   public static async signPresentation(
     keyId: string,
     signPresentationRequest: SignPresentationRequest,
@@ -232,13 +293,21 @@ export default class NfcSdk {
     };
   }
 
+  /**
+   * This method delete a specific stored Verifiable Credential.
+   *
+   * @param credentialId The Id of a credential
+   * @param cardId  The Id of a card
+   * @returns A success response or null
+   */
   public static async deleteStoredCredential(
     credentialId: string,
     cardId: string,
   ): Promise<SuccessResponse | null> {
     // TODO: as first parameter deleteFiles espects "indicesToDelete" which is an array of numbers. Investigate or ask correlation between credentialId(string) <-> indicesToDelete(array of numbers)
     // TODO: dummy const to bypass tsx errors
-    const indicesToDelete = [];
+    const indicesToDelete: number[] = [];
+
     return await TangemSdk.deleteFiles(indicesToDelete, cardId)
       .then(response => {
         return response;
@@ -248,21 +317,35 @@ export default class NfcSdk {
       });
   }
 
+  /**
+   * This method returns all stored Verifiable Credentials.
+   *
+   * @param cardId The Id of a card
+   * @returns The stored credentials
+   */
   public static async getStoredCredentials(
     cardId: string,
   ): Promise<StoredCredentialsResponse> {
-    const data = await TangemSdk.readFiles(true, null, cardId);
-
+    const readPrivateFiles: boolean = true;
+    const indices = undefined;
+    const data = await TangemSdk.readFiles(readPrivateFiles, indices, cardId);
     // TODO convert data to credentials
     return {
       credentials: [],
     };
   }
 
+  /**
+   * This method returns a specific stored Verifiable Credential.
+   *
+   * @param cardId The Id of a card
+   * @param credentialId  The Id of a credential
+   * @returns The stored credential or null
+   */
   public static async getStoredCredential(
     cardId: string,
     credentialId: string,
-  ): Promise<StoredCredentialResponse> {
+  ): Promise<StoredCredentialResponse|null> {
     const data = await this.getStoredCredentials(cardId);
 
     const filtered = data.credentials.filter(
@@ -279,6 +362,13 @@ export default class NfcSdk {
     };
   }
 
+  /**
+   * Sets an access code on the card, if set all commands, including Scan Card, will require to submit this code
+   *
+   * @param accessCode The access code
+   * @param cardId The Id of a card
+   * @returns A success response or null
+   */
   public static async setAccessCode(
     accessCode: string,
     cardId: string,
@@ -290,6 +380,13 @@ export default class NfcSdk {
     });
   }
 
+  /**
+   * Sets a passcode. Passcode protects signing and operations that can alter security parameters.
+   *
+   * @param passcode The pass code
+   * @param cardId The Id of a card
+   * @returns A success response or null
+   */
   public static async setPasscode(
     passcode: string,
     cardId: string,
@@ -301,6 +398,12 @@ export default class NfcSdk {
     });
   }
 
+  /**
+   * Reset both access code and passcode if they were set.
+   *
+   * @param cardId The Id of a card
+   * @returns A success response or null
+   */
   public static async resetUserCodes(
     cardId: string,
   ): Promise<SuccessResponse | null> {
@@ -311,3 +414,5 @@ export default class NfcSdk {
     });
   }
 }
+
+export * from './types';

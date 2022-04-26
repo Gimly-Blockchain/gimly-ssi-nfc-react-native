@@ -1,3 +1,4 @@
+export type { Message } from 'tangem-sdk-react-native';
 export * from './CardInfo';
 export * from './CardInfoResult';
 export * from './Curve';

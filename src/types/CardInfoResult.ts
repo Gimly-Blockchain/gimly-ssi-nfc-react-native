@@ -2,7 +2,7 @@ import type { CardInfo } from './CardInfo'
 import type { LinkedTerminal } from './LinkedTerminal'
 
 export type CardInfoResult = {
-  cardId: String,
+  cardId: string,
   batchId: String,
   cardPublicKeyMultibase: String,
   cardInfo: CardInfo,

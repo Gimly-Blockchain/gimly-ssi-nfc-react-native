@@ -1,5 +1,4 @@
 import type { EllipticCurve } from 'tangem-sdk-react-native';
-import type { Curve } from './Curve'
 import type { FirmwareVersion } from './FirmwareVersion'
 
 
