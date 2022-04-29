@@ -103,13 +103,13 @@ const App = () => {
       });
   };
 
-  const test_deactiveKey = () => {
-    console.log('TEST deactiveKey');
-    addLog('deactiveKey', `cardId: ${cardId}, keyId: ${keyId}`, 'IN');
+  const test_deactivateKey = () => {
+    console.log('TEST deactivateKey');
+    addLog('deactivateKey', `cardId: ${cardId}, keyId: ${keyId}`, 'IN');
 
-    NfcSdk.deactiveKey(cardId, keyId)
+    NfcSdk.deactivateKey(cardId, keyId)
       .then(() => {
-        console.log('deactiveKey done');
+        console.log('deactivateKey done');
         addLog('', 'Success', 'OUT');
       })
       .catch(error => {
@@ -337,8 +337,8 @@ const App = () => {
           </View>
           <View style={styles.button}>
             <Button
-              onPress={test_deactiveKey}
-              title="deactiveKey"
+              onPress={test_deactivateKey}
+              title="deactivateKey"
             />
           </View>
           <View style={styles.button}>

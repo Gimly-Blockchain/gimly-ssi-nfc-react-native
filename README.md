@@ -67,7 +67,7 @@ Deactivate a key by card index, public key or DID key
 ```
 import NfcSdk from 'gimly-ssi-nfc-react-native';
 
-NfcSdk.deactiveKey(cardId, keyId).then(() => {
+NfcSdk.deactivateKey(cardId, keyId).then(() => {
   // handle success
 }).catch(error => {
   // handle error

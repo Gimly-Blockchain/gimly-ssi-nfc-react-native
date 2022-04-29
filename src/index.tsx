@@ -107,7 +107,7 @@ export default class NfcSdk {
    * @param keyId The Key index, public key, or DID/Verification method Key ID
    * @returns null
    */
-  public static async deactiveKey(
+  public static async deactivateKey(
     cardId: string,
     keyId: string,
   ): Promise<null> {

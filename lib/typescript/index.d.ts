@@ -4,7 +4,7 @@ export declare const NfcSdkModule: import("tangem-sdk-react-native").TangemSdk;
 export default class NfcSdk {
     static scanCard(initialMessage?: InitialMessage): Promise<Card>;
     static createKey(cardId: string, curve?: EllipticCurve, initialMessage?: InitialMessage): Promise<CreateWalletResponse | null>;
-    static deactiveKey(): Promise<void>;
+    static deactivateKey(): Promise<void>;
     static getKey(initialMessage: InitialMessage, cardId: string, keyId: string): Promise<Card>;
     static getKeys(initialMessage: InitialMessage, cardId?: string): Promise<Card>;
     static signCredential(hashes: [string], walletPublicKey: string, cardId: string, initialMessage: InitialMessage): Promise<SignResponse | null>;
