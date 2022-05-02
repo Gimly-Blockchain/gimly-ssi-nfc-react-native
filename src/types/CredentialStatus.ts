@@ -1,5 +1,5 @@
 
 export type CredentialStatus = {
-  id: String,
-  type: String,
+  id: string,
+  type: string,
 };

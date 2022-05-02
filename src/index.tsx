@@ -5,6 +5,7 @@ import type {
   SuccessResponse,
   Message,
   FirmwareVersion,
+  File
 } from 'tangem-sdk-react-native';
 import type {
   CardInfoResult,
@@ -241,17 +242,73 @@ export default class NfcSdk {
     signCredentialRequest: SignCredentialRequest,
     cardId: string,
   ): Promise<SignCredentialResponse|null> {
+    // TODO: we have to sign the credential and store it if that is requested. Not sure how to convert that VC to a hash in hex format, so we can use the sign method.
     console.log(keyId, signCredentialRequest, cardId);
-
-    // TODO we have to sign the credential and store it if that is requested. Not sure how to convert that VC to a hash in hex format, so we can use the sign method.
-
-    //   * @param {File[]} files List of files that should be written to card
-    // const files = null;
-
-    // const data = await TangemSdk.writeFiles(files, cardId);
-    //const data = await TangemSdk.readFiles(true, null, cardId);
-    // We need to investigate how it's implemented on the android version of the SDK: https://github.com/Tangem/tangem-sdk-android
-    return null;
+    // TODO: hadcoded VC
+    const verifiableCredential = {
+      "@context": [
+        "https://www.w3.org/2018/credentials/v1",
+        "https://www.w3.org/2018/credentials/examples/v1"
+      ],
+      "id": "http://example.gov/credentials/3732",
+      "type": [
+        "VerifiableCredential",
+        "UniversityDegreeCredential"
+      ],
+      "issuer": {
+        "id": "did:web:vc.transmute.world"
+      },
+      "issuanceDate": "2020-03-10T04:24:12.164Z",
+      "credentialSubject": {
+        "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+        "degree": {
+          "type": "BachelorDegree",
+          "name": "Bachelor of Science and Arts"
+        }
+      },
+      "proof": {
+        "type": "JsonWebSignature2020",
+        "created": "2020-03-21T17:51:48Z",
+        "verificationMethod": "did:web:vc.transmute.world#_Qq0UL2Fq651Q0Fjd6TvnYE-faHiOpRlPVQcY_-tA4A",
+        "proofPurpose": "assertionMethod",
+        "jws": "eyJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdLCJhbGciOiJFZERTQSJ9..OPxskX37SK0FhmYygDk-S4csY_gNhCUgSOAaXFXDTZx86CmI5nU9xkqtLWg-f4cqkigKDdMVdtIqWAvaYx2JBA"
+      }
+    }
+    // TODO: data should be a string representing the VC, is this a json or a hash encrypted string.
+    const file: File = {
+      data: JSON.stringify(verifiableCredential),
+    }
+    const files: File[] = [file]
+    try {
+      const requestResponse = await TangemSdk.writeOwnerFile(files, keyId, cardId)
+      // TODO: check response to convert to desired format response
+      console.log(requestResponse)
+      return {
+        verifiableCredential:  {
+          issuanceDate: '',
+          proof:  {
+            type: '',
+            created: '',
+            proofPurpose: '',
+            verificationMethod: '',
+            jws: '',
+          },
+          "@context": [],
+          id: '',
+          type: [],
+          credentialSubject: { id: ''},
+          issuer: '',
+          expirationDate: '',
+          credentialStatus:  {
+            id: '',
+            type: '',
+          },
+        },
+        storageId: '',
+      };
+    } catch (err) {
+      return null;
+    }
   }
 
   /**
