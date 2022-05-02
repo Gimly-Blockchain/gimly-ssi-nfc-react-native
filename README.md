@@ -16,7 +16,7 @@ The current version of the SDK uses Tangem under the hood, which may require add
 yarn add gimly-ssi-nfc-react-native
 ```
 
-# Scanning a card
+# Scanning a Card
 To start working with the NFC card, you typically have to scan the card first
 
 ```
@@ -93,7 +93,7 @@ Gets all keys by card id
 ```
 import NfcSdk from 'gimly-ssi-nfc-react-native';
 
-NfcSdk.getKeys(initialMessage, cardId).then(() => {
+NfcSdk.getKeys(initialMessage, cardId).then(keyResults => {
   // handle success
 }).catch(error => {
   // handle error
@@ -113,13 +113,13 @@ Name | Type | Description  | Notes
 [**KeyResults**](src/types/KeyResults.md)
 
 
-# Get single Key
+# Get a Single Key
 Gets a key by card id and keyId
 
 ```
 import NfcSdk from 'gimly-ssi-nfc-react-native';
 
-NfcSdk.getKey(initialMessage, cardId, keyId).then(() => {
+NfcSdk.getKey(initialMessage, cardId, keyId).then(keyInfo => {
   // handle success
 }).catch(error => {
   // handle error
@@ -139,7 +139,7 @@ Name | Type | Description  | Notes
 [**KeyInfo**](src/types/KeyInfo.md)
 
 
-# Signing using the key on the NFC card
+# Signing Using the Key on the NFC Card
 
 This method allows you to sign one or more inputs using the private key stored on the NFC card. 
 
@@ -166,7 +166,7 @@ Name | Type | Description  | Notes
 [**SignResponse**](src/types/SignResponse.md)
 
 
-# Adding a proof to a credential
+# Adding a Proof to a Credential
 This method adds a proof to the supplied credential, using the private key on the NFC card and thus making it a Verifiable Credential. It allows for optional storage of the VC on the NFC card.
 
 ```
@@ -192,7 +192,7 @@ Name | Type | Description  | Notes
 [**SignCredentialResponse**](src/types/SignCredentialResponse.md)
 
 
-# Adding a proof to a presentation
+# Adding a Proof to a Presentation
 Sign the supplied presentation using the key on the NFC card, adding a proof and making it a verifiable presentation. Please note that verifiable presentations cannot be stored, as the nature of Verifiable Presentations is to use them on singular invocations only
 
 ```
@@ -218,7 +218,7 @@ Name | Type | Description  | Notes
 
 [**SignPresentationResponse**](src/types/SignPresentationResponse.md)
 
-# Get all Verifiable Credentials stored on the NFC card
+# Get all Verifiable Credentials stored on the NFC Card
 Verified Credentials that are self-issued as well as externally issued with a subject that is related to the NFC card, can be stored on the NFC card. This method returns all stored Verifiable Credentials.
 
 ```
@@ -244,7 +244,7 @@ Name | Type | Description  | Notes
 [**StoredCredentialsResponse**](src/types/StoredCredentialsResponse.md)
 
 
-# Getting a Verifiable Credential stored on the NFC card
+# Getting a Verifiable Credential stored on the NFC Card
 Verified Credentials that are self-issued as well as externally issued with a subject that is related to the NFC card, can be stored on the NFC card. This method returns a specific stored Verifiable Credential.
 
 ```
