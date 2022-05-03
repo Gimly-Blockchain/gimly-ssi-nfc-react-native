@@ -33,7 +33,7 @@
     "ios",
     "android"
   ],
-  "repository": "https://github.com/Gimly-Blockchain/gimly-ssi-nfc-react-native-temporal.git",
+  "repository": "https://github.com/Gimly-Blockchain/gimly-ssi-nfc-react-native.git",
   "author": "dev@gimly.io",
   "license": "MIT",
   "devDependencies": {
@@ -132,6 +132,6 @@
     ]
   },
   "dependencies": {
-    "tangem-sdk-react-native": "git+https://github.com/tangem/tangem-sdk-react-native.git"
+    "tangem-sdk-react-native": "git@github.com:Gimly-Blockchain/tangem-sdk-react-native.git"
   }
 }

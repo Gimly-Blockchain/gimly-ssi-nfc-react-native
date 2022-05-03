@@ -1,0 +1,1 @@
+{"version":3,"names":[],"sources":["CardInfoResult.ts"],"sourcesContent":["import type { CardInfo } from './CardInfo'\n\nexport type CardInfoResult = {\n  cardId: string,\n  batchId: String,\n  cardPublicKeyMultibase: String,\n  cardInfo: CardInfo\n};\n"],"mappings":""}

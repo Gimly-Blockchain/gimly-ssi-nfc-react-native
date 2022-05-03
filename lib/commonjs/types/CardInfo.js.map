@@ -1,0 +1,1 @@
+{"version":3,"names":[],"sources":["CardInfo.ts"],"sourcesContent":["import type { EllipticCurve } from 'tangem-sdk-react-native';\nimport type { FirmwareVersion } from './FirmwareVersion'\n\n\nexport type CardInfo = {\n  curves: EllipticCurve[],\n  firmwareVersion: FirmwareVersion\n};\n"],"mappings":""}

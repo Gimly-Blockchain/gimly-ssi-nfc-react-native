@@ -1,0 +1,1 @@
+{"version":3,"names":[],"sources":["SignResponse.ts"],"sourcesContent":["import type { SignOutputFromInput } from './index';\n\nexport type SignResponse = {\n  publicKeyMultibase: String,\n  signatures: SignOutputFromInput[]\n};"],"mappings":""}

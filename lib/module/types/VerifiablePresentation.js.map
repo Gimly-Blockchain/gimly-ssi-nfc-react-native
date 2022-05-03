@@ -1,0 +1,1 @@
+{"version":3,"names":[],"sources":["VerifiablePresentation.ts"],"sourcesContent":["import type { VerifiableCredential, Proof } from './index'\n\nexport type VerifiablePresentation = {\n  proof: Proof,\n  \"@context\": string[],\n  type: string,\n  verifiableCredential: VerifiableCredential[]\n};\n"],"mappings":""}

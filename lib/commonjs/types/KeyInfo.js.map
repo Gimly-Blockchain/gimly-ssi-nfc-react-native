@@ -1,0 +1,1 @@
+{"version":3,"names":[],"sources":["KeyInfo.ts"],"sourcesContent":["\nexport type KeyInfo = {\n  publicKeyMultibase: string,\n  index: Number\n};\n"],"mappings":""}

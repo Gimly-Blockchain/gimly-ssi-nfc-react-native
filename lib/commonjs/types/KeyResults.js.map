@@ -1,0 +1,1 @@
+{"version":3,"names":[],"sources":["KeyResults.ts"],"sourcesContent":["import type { KeyInfo } from './index'\n\nexport type KeyResults = {\n  id: String,\n  keys: KeyInfo[],\n};"],"mappings":""}

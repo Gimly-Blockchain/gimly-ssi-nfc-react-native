@@ -1,0 +1,1 @@
+{"version":3,"names":[],"sources":["SignRequest.ts"],"sourcesContent":["import type { SignInput } from './index';\n\nexport type SignRequest = {\n  inputs: SignInput[],\n};"],"mappings":""}

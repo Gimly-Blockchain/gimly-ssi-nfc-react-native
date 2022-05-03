@@ -13,7 +13,7 @@
     "gimly-ssi-nfc-react-native": "file:../",
     "react": "17.0.2",
     "react-native": "0.67.1",
-    "tangem-sdk-react-native": "git+https://github.com/tangem/tangem-sdk-react-native.git"
+    "tangem-sdk-react-native": "git@github.com:Gimly-Blockchain/tangem-sdk-react-native.git"
   },
   "devDependencies": {
     "@babel/core": "^7.17.9",
