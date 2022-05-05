@@ -495,7 +495,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = gimlySdkTester/gimlySdkTester.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = P9ZYY876A2;
+				DEVELOPMENT_TEAM = 7UU58CB9KL;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = gimlySdkTester/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -507,7 +507,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.gimlySdkTester;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.gimly-id.ssi-nfc-sdk.app";
 				PRODUCT_NAME = gimlySdkTester;
 				SWIFT_OBJC_BRIDGING_HEADER = "gimlySdkTester-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -524,7 +524,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = gimlySdkTester/gimlySdkTester.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = P9ZYY876A2;
+				DEVELOPMENT_TEAM = 7UU58CB9KL;
 				INFOPLIST_FILE = gimlySdkTester/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -535,7 +535,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.gimlySdkTester;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.gimly-id.ssi-nfc-sdk.app";
 				PRODUCT_NAME = gimlySdkTester;
 				SWIFT_OBJC_BRIDGING_HEADER = "gimlySdkTester-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
