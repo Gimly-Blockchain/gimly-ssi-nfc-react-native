@@ -1,4 +1,4 @@
-import type { EllipticCurve, SuccessResponse, Message } from 'tangem-sdk-react-native';
+import type { SuccessResponse, Message } from 'tangem-sdk-react-native';
 import type { CardInfoResult, KeyInfo, KeyResults, SignCredentialRequest, SignCredentialResponse, SignPresentationRequest, SignPresentationResponse, SignRequest, SignResponse, StoredCredentialsResponse, StoredCredentialResponse } from './types';
 export declare const NfcSdkModule: import("tangem-sdk-react-native").TangemSdk;
 export default class NfcSdk {
@@ -16,7 +16,7 @@ export default class NfcSdk {
      * @param curve A string with the elliptic Curve
      * @returns The results of the created key
      */
-    static createKey(cardId: string, curve: EllipticCurve): Promise<KeyResults>;
+    static createKey(cardId: string, curve: string): Promise<KeyResults>;
     /**
      * Deactivate a key by card index, public key, or DID key
      *
