@@ -36,10 +36,18 @@ type LogItem = {
   type: string,
 };
 
-const LogElement = ({method, params, type}: LogItem) => {
+const LogElement = ({method, params, type}: LogItem): JSX.Element => {
   if (type === "OUT") {
     return (
-      <View style={{flexDirection: 'row'}}><Text style={styles.logW}>{`> `}</Text><Text style={styles.logW}>Response: </Text><Text style={styles.logR}>{params}</Text></View>
+      <View>
+        <View style={styles.row}>
+          <Text style={styles.logW}>{`> `}</Text>
+          <Text style={styles.logW}>Response: </Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.logR}>{params}</Text>
+        </View>
+      </View>
     )
   }
   return (
@@ -49,10 +57,11 @@ const LogElement = ({method, params, type}: LogItem) => {
 
 const App = () => {
   const [logs, setLogs] = useState<LogItem[]>([])
+  const [cardInformation, setCardInformation] = useState<CardInfoResult>()
+  const [cardId, setCardId] = useState<string>()
+  const [keyId, setKeyId] = useState<string>()
+
   const isDarkMode = useColorScheme() === 'dark';
-  let cardInformation: CardInfoResult;
-  let cardId: string;
-  let keyId: string;
 
   const backgroundStyle: ViewStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -71,14 +80,12 @@ const App = () => {
   };
 
   const test_scanCard = () => {
-    console.log('TEST scanCard');
     addLog('scanCard', 'No params', 'IN');
-
     NfcSdk.scanCard()
       .then(response => {
-        console.log('response', JSON.stringify(response));
-        cardInformation = response;
-        cardId = cardInformation.cardId;
+        setCardInformation(response);
+        setCardId(response.cardId);
+
         addLog('', JSON.stringify(response), 'OUT');
       })
       .catch(error => {
@@ -90,12 +97,12 @@ const App = () => {
     console.log('TEST createKey');
     addLog('createKey', 'No params', 'IN');
 
-    const curve = cardInformation.cardInfo.curves[0];
+    const curve = 'secp256k1';
 
     NfcSdk.createKey(cardId, curve)
       .then(response => {
         console.log('response', JSON.stringify(response));
-        keyId = response.keys[0].publicKeyMultibase; // TODO:  changed according to docummentation to: publicKeyMultibase;
+        setKeyId(response.keys[0].publicKeyMultibase); // TODO:  changed according to docummentation to: publicKeyMultibase;
         addLog('', JSON.stringify(response), 'OUT');
       })
       .catch(error => {
@@ -149,7 +156,6 @@ const App = () => {
   };
 
   const test_signUsingKey = () => {
-
     console.log('TEST signUsingKey');
 
     const keyId =
@@ -317,79 +323,85 @@ const App = () => {
           <Text style={styles.sectionTitle}>Gimly NFC SDK tester</Text>
 
           <View style={styles.terminal}>
-            <View style={{flexDirection: 'row'}}><Text style={styles.logW}>{`> `}</Text><Text style={styles.logW}>Logs will display here</Text></View>
-            {logs.map(log => <LogElement method={log.method} params={log.params} type={log.type} />)}
+            <ScrollView
+              contentContainerStyle={{ flexGrow: 1 }}
+              contentInsetAdjustmentBehavior="automatic"
+            >
+              <View style={{flexDirection: 'row'}}><Text style={styles.logW}>{`> `}</Text><Text style={styles.logW}>Logs will display here</Text></View>
+              {logs.map(log => <LogElement method={log.method} params={log.params} type={log.type} />)}
+            </ScrollView>
           </View>
 
-          <ScrollView
-            contentContainerStyle={{ flexGrow: 1 }}
-            contentInsetAdjustmentBehavior="automatic"
-          >
-
-          <View style={styles.button}>
-            <Button onPress={test_scanCard} title="scanCard" />
-          </View>
-          <View style={styles.button}>
-            <Button
-              onPress={test_createKey}
-              title="createKey"
-            />
-          </View>
-          <View style={styles.button}>
-            <Button
-              onPress={test_deactivateKey}
-              title="deactivateKey"
-            />
-          </View>
-          <View style={styles.button}>
-            <Button
-              onPress={test_getKey}
-              title="getKey"
-            />
-          </View>
-          <View style={styles.button}>
-            <Button
-              onPress={test_getKeys}
-              title="getKeys"
-            />
-          </View>
-          <View style={styles.button}>
-            <Button
-              onPress={test_signUsingKey}
-              title="signUsingKey"
-            />
-          </View>
-          <View style={styles.button}>
-            <Button
-              onPress={test_signCredential}
-              title="signCredential"
-            />
-          </View>
-          <View style={styles.button}>
-            <Button
-              onPress={test_signPresentation}
-              title="signPresentation"
-            />
-          </View>
-          <View style={styles.button}>
-            <Button
-              onPress={test_deleteStoredCredential}
-              title="deleteStoredCredential"
-            />
-          </View>
-          <View style={styles.button}>
-            <Button
-              onPress={test_getStoredCredentials}
-              title="getStoredCredentials"
-            />
-          </View>
-          <View style={styles.button}>
-            <Button
-              onPress={test_getStoredCredential}
-              title="getStoredCredential"
-            />
-          </View>
-          </ScrollView>
+          <View style={styles.bottom}> 
+            <ScrollView
+              contentContainerStyle={{ flexGrow: 1 }}
+              contentInsetAdjustmentBehavior="automatic"
+            >
+            <View style={styles.button}>
+              <Button onPress={test_scanCard} title="scanCard" />
+            </View>
+            <View style={styles.button}>
+              <Button
+                onPress={test_createKey}
+                title="createKey"
+              />
+            </View>
+            <View style={styles.button}>
+              <Button
+                onPress={test_deactivateKey}
+                title="deactivateKey"
+              />
+            </View>
+            <View style={styles.button}>
+              <Button
+                onPress={test_getKey}
+                title="getKey"
+              />
+            </View>
+            <View style={styles.button}>
+              <Button
+                onPress={test_getKeys}
+                title="getKeys"
+              />
+            </View>
+            <View style={styles.button}>
+              <Button
+                onPress={test_signUsingKey}
+                title="signUsingKey"
+              />
+            </View>
+            <View style={styles.button}>
+              <Button
+                onPress={test_signCredential}
+                title="signCredential"
+              />
+            </View>
+            <View style={styles.button}>
+              <Button
+                onPress={test_signPresentation}
+                title="signPresentation"
+              />
+            </View>
+            <View style={styles.button}>
+              <Button
+                onPress={test_deleteStoredCredential}
+                title="deleteStoredCredential"
+              />
+            </View>
+            <View style={styles.button}>
+              <Button
+                onPress={test_getStoredCredentials}
+                title="getStoredCredentials"
+              />
+            </View>
+            <View style={styles.button}>
+              <Button
+                onPress={test_getStoredCredential}
+                title="getStoredCredential"
+              />
+            </View>
+            </ScrollView>
+            </View>
         </View>
     </SafeAreaView>
   );
@@ -403,6 +415,12 @@ const styles = StyleSheet.create({
   },
   button:  {
     marginBottom: 20,
+  },
+  bottom: {
+    borderRadius: 5,
+    width: '80%',
+    height: '50%',
+    padding: 10,
   },
   terminal: {
     borderRadius: 5,
@@ -427,6 +445,9 @@ const styles = StyleSheet.create({
   logR: {
     color: '#ac6781',
     fontSize: 11
+  },
+  row: {
+    flexDirection: 'row',
   }
 });
 
