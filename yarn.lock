@@ -9004,10 +9004,9 @@ table@^6.0.9:
     string-width "^4.2.3"
     strip-ansi "^6.0.1"
 
-"tangem-sdk-react-native@git@github.com:Gimly-Blockchain/tangem-sdk-react-native.git":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/tangem-sdk-react-native/-/tangem-sdk-react-native-2.1.0.tgz#c6d095b453dca787f9fecbd691f6aa0fd75b4fe1"
-  integrity sha512-DSuN3EiZGnEl+VbFQqqbTWKHoHJkpnS8NBtP35l/p/iMVDS7XZq0yQ6uoZmSVQ0n5mS6Ob1sRp5uXIB1UrQ8vw==
+"tangem-sdk-react-native@git+https://github.com/Gimly-Blockchain/tangem-sdk-react-native.git":
+  version "1.0.0"
+  resolved "git+https://github.com/Gimly-Blockchain/tangem-sdk-react-native.git#54839404b4363b3429b41b283f06581611f15e6b"
 
 temp-dir@^1.0.0:
   version "1.0.0"

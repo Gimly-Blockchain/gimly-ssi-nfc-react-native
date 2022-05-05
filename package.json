@@ -132,6 +132,6 @@
     ]
   },
   "dependencies": {
-    "tangem-sdk-react-native": "git@github.com:Gimly-Blockchain/tangem-sdk-react-native.git"
+    "tangem-sdk-react-native": "git+https://github.com/Gimly-Blockchain/tangem-sdk-react-native.git"
   }
 }
