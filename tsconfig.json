@@ -24,6 +24,9 @@
     "strict": true,
     "target": "esnext"
   },
+ "exclude": [
+     "example"
+ ],
   "typedocOptions": {
     "entryPoints": ["src/index.tsx"],
     "out": "docs"
