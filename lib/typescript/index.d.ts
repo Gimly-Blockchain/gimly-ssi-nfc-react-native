@@ -24,7 +24,7 @@ export default class NfcSdk {
      * @param keyId The Key index, public key, or DID/Verification method Key ID
      * @returns null
      */
-    static deactivateKey(cardId: string, keyId: string): Promise<null>;
+    static deactivateKey(cardId: string, keyId: string): Promise<SuccessResponse | null>;
     /**
      * Get all keys by card Id
      *
@@ -32,8 +32,7 @@ export default class NfcSdk {
      * @param cardId The Id of a card
      * @returns The keys retrieved from the card
      */
-    static getKeys(initialMessage: Message, //TODO the initialMessage key is not defined on the Terminal API
-    cardId?: string): Promise<KeyResults>;
+    static getKeys(initialMessage: Message, cardId?: string): Promise<KeyResults>;
     /**
      * Get a key by Card Id and keyId
      *
@@ -118,3 +117,4 @@ export default class NfcSdk {
     static resetUserCodes(cardId: string): Promise<SuccessResponse | null>;
 }
 export * from './types';
+export { EllipticCurve } from 'tangem-sdk-react-native';

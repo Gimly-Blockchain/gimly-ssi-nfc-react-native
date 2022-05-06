@@ -78,6 +78,7 @@ export default class NfcSdk {
     cardId: string,
     curve: string,
   ): Promise<KeyResults> {
+
     let ellipticCurve = EllipticCurve.Secp256k1; //default
     if (curve === 'secp256k1') ellipticCurve = EllipticCurve.Secp256k1;
     if (curve === 'ed25519') ellipticCurve = EllipticCurve.Ed25519;
@@ -108,11 +109,11 @@ export default class NfcSdk {
   public static async deactivateKey(
     cardId: string,
     keyId: string,
-  ): Promise<null> {
+  ): Promise<SuccessResponse | null>  {
 
-    const data = await TangemSdk.purgeWallet(keyId, cardId);
+    const response: SuccessResponse = await TangemSdk.purgeWallet(keyId, cardId);
 
-    return null;
+    return response;
   }
 
   /**
@@ -126,6 +127,8 @@ export default class NfcSdk {
     initialMessage: Message,
     cardId?: string,
   ): Promise<KeyResults> {
+
+    console.log(cardId) //TODO: what should we do with the cardId
     const data = await TangemSdk.scanCard(initialMessage);
 
     const keys = data.wallets
@@ -138,6 +141,7 @@ export default class NfcSdk {
           return keyInfo;
         })
       : [];
+
     const response: KeyResults = {
       id: data.cardId,
       keys,
@@ -192,14 +196,14 @@ export default class NfcSdk {
     const hashes = inputs.map(input => input.data);
     const data = await TangemSdk.signHashes(hashes, keyId, cardId);
 
-    const signatures: SignOutputFromInput[] = data?.[0].signatures.map(
-      (signature, index) => {
+    const signatures: SignOutputFromInput[] = data?.signatures.map(
+      (signature: string, index: number) => {
         return {
           input: {data: hashes[index], encoding: 'hex'},
           output: {data: signature, encoding: 'hex'},
         };
       },
-    );
+    )
 
     const response: SignResponse = {
       publicKeyMultibase: keyId,
@@ -231,9 +235,7 @@ export default class NfcSdk {
 
     try {
       const requestResponse = await TangemSdk.writeOwnerFile(files, keyId, cardId)
-
       console.log(requestResponse)
-
       return {
         verifiableCredential:  {
           issuanceDate: '',
@@ -455,3 +457,4 @@ export default class NfcSdk {
 }
 
 export * from './types';
+export { EllipticCurve } from 'tangem-sdk-react-native';

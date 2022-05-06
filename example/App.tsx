@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import type { ViewStyle } from 'react-native';
 import {
   SafeAreaView,
@@ -19,7 +19,7 @@ import {
   Button,
 } from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-import NfcSdk from 'gimly-ssi-nfc-react-native'; //import NfcSdk from 'gimly-ssi-nfc-react-native';
+import NfcSdk, { EllipticCurve } from 'gimly-ssi-nfc-react-native'; // change to 'src' to use local files
 import type {
   CardInfoResult,
   Message,
@@ -27,8 +27,8 @@ import type {
   SignRequest,
   SignCredentialRequest,
   Credential,
-  SignPresentationRequest
-} from 'gimly-ssi-nfc-react-native' // from 'gimly-ssi-nfc-react-native/types';
+  SignPresentationRequest,
+} from 'gimly-ssi-nfc-react-native'; // change to 'src' to use local files
 
 type LogItem = {
   method: string,
@@ -56,6 +56,7 @@ const LogElement = ({method, params, type}: LogItem): JSX.Element => {
 }
 
 const App = () => {
+  const scrollViewRef = useRef<ScrollView>(null);
   const [logs, setLogs] = useState<LogItem[]>([])
   const [cardInformation, setCardInformation] = useState<CardInfoResult>()
   const [cardId, setCardId] = useState<string>()
@@ -80,127 +81,139 @@ const App = () => {
     console.log(`METHOD: ${method}, PARAMS: ${params}, TYPE: ${type}`)
   };
 
-  const testScanCard = () => {
+  const testScanCard = async () => {
     addLog('scanCard', 'No params', 'INPUT');
-    NfcSdk.scanCard()
-      .then(response => {
-        setCardInformation(response);
-        setCardId(response.cardId);
+    try {
+      const response = await NfcSdk.scanCard();
 
-        addLog('', JSON.stringify(response), 'OUTPUT');
-      })
-      .catch(error => {
-        console.log(error);
-      });
+      setCardInformation(response);
+      setCardId(response.cardId);
+      addLog('', JSON.stringify(response, null, 2), 'OUTPUT');
+    } catch(error) {
+      addLog('', error.message, 'OUTPUT');
+    }
   };
 
-  const testCreateKey = () => {
+  const testSetAccessCode = async () => {
+    const accessCode = '123456';
+    addLog('testResetUserCodes', `accessCode: ${accessCode} cardId: ${cardId}`, 'INPUT');
+
+try {
+      const response = await NfcSdk.setAccessCode(accessCode, cardId);
+
+      setCardInformation(response);
+      setCardId(response.cardId);
+      addLog('', JSON.stringify(response, null, 2), 'OUTPUT');
+    } catch(error) {
+      addLog('', error.message, 'OUTPUT');
+    }
+  };
+
+  const testSetPasscode = async () => {
+    const passcode = '123456';
+    addLog('testResetUserCodes', `passcode: ${passcode} cardId: ${cardId}`, 'INPUT');
+
+    try {
+      const response = await NfcSdk.setPasscode(passcode, cardId);
+
+      setCardInformation(response);
+      setCardId(response.cardId);
+      addLog('', JSON.stringify(response, null, 2), 'OUTPUT');
+    } catch(error) {
+      addLog('', error.message, 'OUTPUT');
+    }
+  };
+
+  const testResetUserCodes = async () => {
+    addLog('testResetUserCodes', `cardId: ${cardId}`, 'INPUT');
+
+    try {
+      const response = await NfcSdk.resetUserCodes(cardId);
+
+      setCardInformation(response);
+      setCardId(response.cardId);
+      addLog('', JSON.stringify(response, null, 2), 'OUTPUT');
+    } catch(error) {
+      addLog('', error.message, 'OUTPUT');
+    }
+  };
+
+  const testCreateKey = async () => {
     addLog('createKey', `cardId=${cardId} curve=secp256k1`, 'INPUT');
-
     const curve = 'secp256k1';
+    try {
+      const response = await NfcSdk.createKey(cardId, EllipticCurve.Secp256k1);
 
-    NfcSdk.createKey(cardId, curve)
-      .then(response => {
-        setKeyId(response.keys[0].publicKeyMultibase);
-        addLog('', JSON.stringify(response), 'OUTPUT');
-      })
-      .catch(error => {
-        console.log(error);
-      });
+      setKeyId(response.keys[0].publicKeyMultibase);
+      addLog('', JSON.stringify(response, null, 2), 'OUTPUT');
+    } catch(error) {
+      addLog('', error.message, 'OUTPUT');
+    }
   };
 
   const testDeactivateKey = async () => {
     addLog('deactivateKey', `cardId: ${cardId}, keyId: ${keyId}`, 'INPUT');
 
-    if (!keyId) {
-      const initialMessage: Message = {body: '', header: ''};
-      const { keys } = NfcSdk.getKeys(initialMessage, cardId);
-      setKeyId(keys[0].publicKeyMultibase);
-    }
-
-    NfcSdk.deactivateKey(cardId, keyId)
-    .then(() => {
-      console.log('deactivateKey done');
+    try {
+      const response = await NfcSdk.deactivateKey(cardId, keyId)
       addLog('', 'Success', 'OUTPUT');
-    })
-    .catch(error => {
-      console.log(error);
-    });
-
+    } catch(error) {
+      addLog('', error.message, 'OUTPUT');
+    }
   };
 
   const testGetKey = async () => {
     const initialMessage: Message = {body: '', header: ''};
-
     if (!keyId) {
       const initialMessage: Message = {body: '', header: ''};
-      const { keys } = NfcSdk.getKeys(initialMessage, cardId);
+      const { keys } = await NfcSdk.getKeys(initialMessage, cardId);
       setKeyId(keys[0].publicKeyMultibase);
     }
-
-    addLog('getKey', `initialMessage: ${JSON.stringify(initialMessage)}, cardId: ${cardId}, keyId: ${keyId}`, 'IN');
-
-    NfcSdk.getKey(initialMessage, cardId, keyId)
-    .then(response => {
-      addLog('', JSON.stringify(response), 'OUTPUT');
-    })
-    .catch(error => {
-      console.log(error);
-    });
+    addLog('getKey', `initialMessage: ${JSON.stringify(initialMessage, null, 2)}, cardId: ${cardId}, keyId: ${keyId}`, 'IN');
+    try {
+      const response = await NfcSdk.getKey(initialMessage, cardId, keyId);
+      addLog('', JSON.stringify(response, null, 2), 'OUTPUT');
+    } catch(error) {
+      addLog('', error.message, 'OUTPUT');
+    }
   };
 
-  const testGetKeys = () => {
+  const testGetKeys = async () => {
     const initialMessage: Message = {body: '', header: ''};
-
-    addLog('getKeys', `initialMessage: ${JSON.stringify(initialMessage)}, cardId: ${cardId}`, 'INPUT');
-
-    NfcSdk.getKeys(initialMessage, cardId)
-      .then(response => {
-        addLog('', JSON.stringify(response), 'OUTPUT');
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    addLog('getKeys', `initialMessage: ${JSON.stringify(initialMessage, null, 2)}, cardId: ${cardId}`, 'INPUT');
+    try {
+      const response = await NfcSdk.getKeys(initialMessage, cardId);
+      addLog('', JSON.stringify(response, null, 2), 'OUTPUT');
+    } catch(error) {
+      addLog('', error.message, 'OUTPUT');
+    }
   };
 
   const testSignUsingKey = async () => {
-
-    let keyId0; // TODO improve this
-
-    if (!keyId) {
-      const initialMessage: Message = {body: '', header: ''};
-      const { keys } = await NfcSdk.getKeys(initialMessage, cardId);
-      addLog('', keys[0].publicKeyMultibase, 'OUTPUT');
-
-      setKeyId(keys[0].publicKeyMultibase);
-      keyId0 = keys[0].publicKeyMultibase;
-    }
-
-    const inputs: SignInput[] = [{data: '44617461207573656420666f722068617368696e67'},{data: '4461746120666f7220757365642068617368696e67'}];
+    const inputs: SignInput[] = [
+      {data: '44617461207573656420666f722068617368696e67', encoding: {}},
+      {data: '4461746120666f7220757365642068617368696e67', encoding: {}}
+    ];
 
     const signRequest: SignRequest = {inputs};
 
-    addLog('signUsingKey', `keyId: ${keyId}, signRequest: ${JSON.stringify(signRequest)}, cardId: ${cardId}`, 'INPUT');
-
-    NfcSdk.signUsingKey(keyId || keyId0, signRequest, cardId)
-      .then(response => {
-        addLog('', JSON.stringify(response), 'OUTPUT');
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    addLog('signUsingKey', `keyId: ${keyId}, signRequest: ${JSON.stringify(signRequest, null, 2)}, cardId: ${cardId}`, 'INPUT');
+    try {
+      const response = await NfcSdk.signUsingKey(keyId, signRequest, cardId)
+      addLog('', JSON.stringify(response, null, 2), 'OUTPUT');
+    } catch(error) {
+      addLog('', error.message, 'OUTPUT');
+    }
   };
 
   const testSignCredential = async () => {
-    let keyId0; // TODO improve this
-
-    if (!keyId) {
+    let keyIdCurrent = keyId;
+    if (!keyIdCurrent) {
       const initialMessage: Message = {body: '', header: ''};
       const { keys } = await NfcSdk.getKeys(initialMessage, cardId);
-      addLog('', keys[0].publicKeyMultibase, 'OUTPUT');
-
+      addLog('getKeys', JSON.stringify(keys, null, 2), 'OUTPUT');
       setKeyId(keys[0].publicKeyMultibase);
-      keyId0 = keys[0].publicKeyMultibase;
+      keyIdCurrent = keys[0].publicKeyMultibase;
     }
     // got it from here: https://w3c-ccg.github.io/vc-examples/edu/university-degree-verifiable-credential.json
     // please check other examples on the same repo
@@ -214,7 +227,7 @@ const App = () => {
       /*issuer: {
         id: 'did:web:vc.transmute.world',
       },*/
-      issuer: 'did:web:vc.transmute.world', // TODO: according to doccumentation this type is a string, test and remove comment if correct
+      issuer: 'did:web:vc.transmute.world', // TODO: according to doccumentation this type is a string, test and remove comment if correct. TEST WITH REAL CARD
       issuanceDate: '2020-03-10T04:24:12.164Z',
       credentialSubject: {
         id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
@@ -223,7 +236,7 @@ const App = () => {
           name: 'Bachelor of Science and Arts',
         },
       },
-      proof: { // TODO: this parameter did not exist on Credential type so i hada to add it
+      proof: { // TODO: this parameter did not exist on Credential type so I had to add it. TEST WITH REAL CARD
         type: 'JsonWebSignature2020',
         created: '2020-03-21T17:51:48Z',
         verificationMethod:
@@ -231,33 +244,28 @@ const App = () => {
         proofPurpose: 'assertionMethod',
         jws: 'eyJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdLCJhbGciOiJFZERTQSJ9..OPxskX37SK0FhmYygDk-S4csY_gNhCUgSOAaXFXDTZx86CmI5nU9xkqtLWg-f4cqkigKDdMVdtIqWAvaYx2JBA',
       },
-      expirationDate: '2020-03-10T04:24:12.164Z', // TODO: had to add this parameter, SDK is expecting it
-      credentialStatus: { // TODO: had to add this parameter, SDK is expecting it
+      expirationDate: '2020-03-10T04:24:12.164Z', // TODO: had to add this parameter, SDK is expecting it. TEST WITH REAL CARD
+      credentialStatus: { // TODO: had to add this parameter, SDK is expecting it. TEST WITH REAL CARD
         id: '',
         type: ''
       }
     };
-
     const signCredentialRequest: SignCredentialRequest = {
       credential,
       store: true,
     };
-
-    addLog('signCredential', `keyId: ${keyId || keyId0}, signCredentialRequest: ${JSON.stringify(signCredentialRequest)}, cardId: ${cardId}`, 'INPUT');
-
-    NfcSdk.signCredential(keyId || keyId0, signCredentialRequest, cardId)
-      .then(response => {
-        console.log('response', JSON.stringify(response));
-        addLog('', JSON.stringify(response), 'OUTPUT');
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    addLog('signCredential', `keyId: ${keyIdCurrent}, signCredentialRequest: ${JSON.stringify(signCredentialRequest, null, 2)}, cardId: ${cardId}`, 'INPUT');
+    try {
+      const response = await NfcSdk.signCredential(keyIdCurrent, signCredentialRequest, cardId)
+      console.log('response', JSON.stringify(response, null, 2));
+      addLog('', JSON.stringify(response, null, 2), 'OUTPUT');
+    } catch(error) {
+      addLog('', error.message, 'OUTPUT');
+    }
   };
 
-  const testSignPresentation = () => {
+  const testSignPresentation = async () => {
     console.log('TEST signPresentation');
-
     const signPresentationRequest: SignPresentationRequest = {
       presentation:  {
         "@context": [],
@@ -265,58 +273,49 @@ const App = () => {
         verifiableCredential: []
       }
     };
-
     const keyId =
       '02EE0265FB7B23F19739CD9706E332209E28BB10C046DB0F984DF24A8B877BCA40';
-
-    addLog('signPresentation', `keyId: ${keyId}, signPresentationRequest: ${JSON.stringify(signPresentationRequest)}, cardId: ${cardId}`, 'IN');
-
-    NfcSdk.signPresentation(keyId, signPresentationRequest, cardId)
-      .then(response => {
-        console.log('response', JSON.stringify(response));
-        addLog('', JSON.stringify(response), 'OUTPUT');
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    addLog('signPresentation', `keyId: ${keyId}, signPresentationRequest: ${JSON.stringify(signPresentationRequest, null, 2)}, cardId: ${cardId}`, 'IN');
+    try {
+      const response = await NfcSdk.signPresentation(keyId, signPresentationRequest, cardId)
+      console.log('response', JSON.stringify(response, null, 2));
+      addLog('', JSON.stringify(response, null, 2), 'OUTPUT');
+    } catch(error) {
+      addLog('', error.message, 'OUTPUT');
+    }
   };
 
-  const testDeleteStoredCredential = () => {
+  const testDeleteStoredCredential = async () => {
     const credentialId = '123456';
-
     addLog('deleteStoredCredential', `credentialId: ${credentialId}, cardId: ${cardId}`, 'IN');
-
-    NfcSdk.deleteStoredCredential(credentialId, cardId)
-      .then(() => {
-        addLog('deleteStoredCredential', 'Successs', 'OUTPUT');
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    try {
+      const response = await NfcSdk.deleteStoredCredential(credentialId, cardId)
+      addLog('deleteStoredCredential', 'Successs', 'OUTPUT');
+    } catch(error) {
+      addLog('', error.message, 'OUTPUT');
+    }
   };
 
-  const testGetStoredCredentials = () => {
+  const testGetStoredCredentials = async () => {
     addLog('getStoredCredentials', `cardId: ${cardId}`, 'INPUT');
-    NfcSdk.getStoredCredentials(cardId)
-      .then(response => {
-        addLog('getStoredCredentials', JSON.stringify(response), 'OUTPUT');
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    try {
+      const response = await NfcSdk.getStoredCredentials(cardId)
+      addLog('getStoredCredentials', JSON.stringify(response, null, 2), 'OUTPUT');
+    } catch(error) {
+      addLog('', error.message, 'OUTPUT');
+    }
   };
 
-  const testGetStoredCredential = () => {
+  const testGetStoredCredential = async () => {
     console.log('TEST getStoredCredential');
     const credentialId = '';
     addLog('getStoredCredential', `cardId: ${cardId}, credentialId: ${credentialId}`, 'IN');
-    NfcSdk.getStoredCredential(cardId, credentialId)
-      .then(response => {
-        addLog('getStoredCredential', JSON.stringify(response), 'OUTPUT');
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    try {
+      const response = await NfcSdk.getStoredCredential(cardId, credentialId)
+      addLog('getStoredCredential', JSON.stringify(response, null, 2), 'OUTPUT');
+    } catch(error) {
+      addLog('', error.message, 'OUTPUT');
+    }
   };
 
   return (
@@ -328,21 +327,48 @@ const App = () => {
 
           <View style={styles.terminal}>
             <ScrollView
+              ref={scrollViewRef}
               contentContainerStyle={{ flexGrow: 1 }}
               contentInsetAdjustmentBehavior="automatic"
+              onContentSizeChange={() => {
+                if (scrollViewRef.current) {
+                  scrollViewRef.current.scrollToEnd({ animated: true })
+                }
+              }}
             >
               <View style={{flexDirection: 'row'}}><Text style={styles.logW}>{`> `}</Text><Text style={styles.logW}>Logs will display here</Text></View>
               {logs.map(log => <LogElement method={log.method} params={log.params} type={log.type} />)}
             </ScrollView>
           </View>
 
-          <View style={styles.bottom}> 
+          <View style={styles.bottom}>
             <ScrollView
               contentContainerStyle={{ flexGrow: 1 }}
               contentInsetAdjustmentBehavior="automatic"
             >
             <View style={styles.button}>
-              <Button onPress={testScanCard} title="scanCard" />
+              <Button
+                onPress={testScanCard}
+                title="scanCard"
+              />
+            </View>
+            <View style={styles.button}>
+              <Button
+                onPress={testSetAccessCode}
+                title="setAccessCode"
+              />
+            </View>
+            <View style={styles.button}>
+              <Button
+                onPress={testSetPasscode}
+                title="setPasscode"
+              />
+            </View>
+            <View style={styles.button}>
+              <Button
+                onPress={testResetUserCodes}
+                title="resetUserCodes"
+              />
             </View>
             <View style={styles.button}>
               <Button
