@@ -1,1 +1,1 @@
-{"version":3,"names":[],"sources":["Proof.ts"],"sourcesContent":["\nexport type Proof = {\n  type: string,\n  created: string,\n  proofPurpose: string,\n  verificationMethod: string,\n  jws: string,\n};\n"],"mappings":""}
+{"version":3,"names":[],"sources":["Proof.ts"],"sourcesContent":["export type Proof = {\n  type: string;\n  created: string;\n  proofPurpose: string;\n  verificationMethod: string;\n  jws: string;\n};\n"],"mappings":""}

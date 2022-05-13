@@ -1,5 +1,4 @@
-
 export type SignOutput = {
-  data: String,
-  encoding: {}
+  data: String;
+  encoding: {};
 };

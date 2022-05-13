@@ -22,7 +22,7 @@ To start working with the NFC card, you typically have to scan the card first
 ```
 import NfcSdk from 'gimly-ssi-nfc-react-native';
 
-NfcSdk.scanCard().then(cardInfo => {
+NfcSdk.wallet.scanCard().then(cardInfo => {
   // handle cardInfo
 }).catch(error => {
   // handle error
@@ -37,12 +37,12 @@ None
 [**CardInfoResult**](src/types/CardInfoResult.md)
 
 # Creating a key(pair) on the NFC card
-This creates an asymmetric keypair on the NFC card. The private key will never be disclosed and is safely stored in the card. The public key is disclosed. The key can be used as a regular keypair, not using DIDs at all if desired. To access and use the key later you can use the public key value, its card index or the DID Key id value 
+This creates an asymmetric keypair on the NFC card. The private key will never be disclosed and is safely stored in the card. The public key is disclosed. The key can be used as a regular keypair, not using DIDs at all if desired. To access and use the key later you can use the public key value, its card index or the DID Key id value
 
 ```
 import NfcSdk from 'gimly-ssi-nfc-react-native';
 
-NfcSdk.createKey(cardId, curve).then(keyInfo => {
+NfcSdk.ssi.createKey(curve).then(keyInfo => {
   // handle keyInfo
 }).catch(error => {
   // handle error
@@ -53,7 +53,6 @@ NfcSdk.createKey(cardId, curve).then(keyInfo => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**cardId**       | **String**                     | The Id of a card                                                     | Optional. Default to null.
 **curve**        | [**Curve**](src/types/Curve.md) |                                                                      | Optional. Default to null.
 
 
@@ -67,7 +66,7 @@ Deactivate a key by card index, public key or DID key
 ```
 import NfcSdk from 'gimly-ssi-nfc-react-native';
 
-NfcSdk.deactivateKey(cardId, keyId).then(() => {
+NfcSdk.ssi.deactivateKey(keyId).then(() => {
   // handle success
 }).catch(error => {
   // handle error
@@ -78,7 +77,6 @@ NfcSdk.deactivateKey(cardId, keyId).then(() => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**cardId** | **String**| The Id of a card | 
 **keyId** | **String** | The Key index, public key or DID/Verification method key id |
 
 
@@ -93,7 +91,7 @@ Gets all keys by card id
 ```
 import NfcSdk from 'gimly-ssi-nfc-react-native';
 
-NfcSdk.getKeys(initialMessage, cardId).then(keyResults => {
+NfcSdk.ssi.getKeys(initialMessage).then(keyResults => {
   // handle success
 }).catch(error => {
   // handle error
@@ -105,7 +103,6 @@ NfcSdk.getKeys(initialMessage, cardId).then(keyResults => {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **initialMessage** | **String** | The message to display |
-**cardId** | **String**| The Id of a card | 
 
 
 ### Return type
@@ -119,7 +116,7 @@ Gets a key by card id and keyId
 ```
 import NfcSdk from 'gimly-ssi-nfc-react-native';
 
-NfcSdk.getKey(initialMessage, cardId, keyId).then(keyInfo => {
+NfcSdk.ssi.getKey(initialMessage, keyId).then(keyInfo => {
   // handle success
 }).catch(error => {
   // handle error
@@ -131,8 +128,7 @@ NfcSdk.getKey(initialMessage, cardId, keyId).then(keyInfo => {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **initialMessage** | **String** | The message to display |
-**cardId** | **String**| The Id of a card | 
-**keyId** | **String**| The Id of a key | 
+**keyId** | **String**| The Id of a key |
 
 ### Return type
 
@@ -141,12 +137,12 @@ Name | Type | Description  | Notes
 
 # Signing Using the Key on the NFC Card
 
-This method allows you to sign one or more inputs using the private key stored on the NFC card. 
+This method allows you to sign one or more inputs using the private key stored on the NFC card.
 
 ```
 import NfcSdk from 'gimly-ssi-nfc-react-native';
 
-NfcSdk.signUsingKey(keyId, signRequest, cardId).then(signResponse => {
+NfcSdk.ssi.signUsingKey(signRequest, keyId).then(signResponse => {
   // handle sign response
 }).catch(error => {
   // handle error
@@ -157,9 +153,8 @@ NfcSdk.signUsingKey(keyId, signRequest, cardId).then(signResponse => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**keyId** | **String** | The Key index, public key or DID/Verification method key id | Default to null.
 **signRequest** | [**SignRequest**](src/types/SignRequest.md) | Signs one or more inputs, typically hashes in hex format |
-**cardId** | **String** | The Id of a card | Optional. Default to null.
+**keyId** | **String** | The Key index, public key or DID/Verification method key id | Default to null.
 
 ### Return type
 
@@ -172,7 +167,7 @@ This method adds a proof to the supplied credential, using the private key on th
 ```
 import NfcSdk from 'gimly-ssi-nfc-react-native';
 
-NfcSdk.signCredential(keyId, signCredentialRequest, cardId).then(signCredentialResponse => {
+NfcSdk.ssi.signCredential(keyId, signCredentialRequest).then(signCredentialResponse => {
   // handle sign response
 }).catch(error => {
   // handle error
@@ -183,9 +178,8 @@ NfcSdk.signCredential(keyId, signCredentialRequest, cardId).then(signCredentialR
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
+**SignCredentialRequest** | [**SignCredentialRequest**](src/types/SignCredentialRequest.md) | Signs one or more inputs, typically hashes in hex format
 **keyId** | **String** | The Key index, public key or DID/Verification method key id | Default to null.
-**SignCredentialRequest** | [**SignCredentialRequest**](src/types/SignCredentialRequest.md) | Signs one or more inputs, typically hashes in hex format |
-**cardId** | **String** | The Id of a card | Optional. Default to null.
 
 ### Return type
 
@@ -198,7 +192,7 @@ Sign the supplied presentation using the key on the NFC card, adding a proof and
 ```
 import NfcSdk from 'gimly-ssi-nfc-react-native';
 
-NfcSdk.signPresentation(keyId, signPresentationRequest, cardId).then(signPresentationResponse => {
+NfcSdk.ssi.signPresentation(keyId, signPresentationRequest).then(signPresentationResponse => {
   // handle sign response
 }).catch(error => {
   // handle error
@@ -210,9 +204,8 @@ NfcSdk.signPresentation(keyId, signPresentationRequest, cardId).then(signPresent
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
+**SignPresentationRequest** | [**SignPresentationRequest**](src/types/SignPresentationRequest.md) | Signs a presentation.
 **keyId** | **String** | The Key index, public key or DID/Verification method key id | Default to null.
-**SignPresentationRequest** | [**SignPresentationRequest**](src/types/SignPresentationRequest.md) | Signs a presentation |
-**cardId** | **String** | The Id of a card | Optional. Default to null.
 
 ### Return type
 
@@ -224,20 +217,12 @@ Verified Credentials that are self-issued as well as externally issued with a su
 ```
 import NfcSdk from 'gimly-ssi-nfc-react-native';
 
-NfcSdk.getStoredCredentials(cardId).then(credentials => {
+NfcSdk.files.getStoredCredentials().then(credentials => {
   // handle credentials
 }).catch(error => {
   // handle error
 })
 ```
-
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**cardId** | **String**| The Id of a card | Optional. Default to null.
-
 
 ### Return type
 
@@ -250,7 +235,7 @@ Verified Credentials that are self-issued as well as externally issued with a su
 ```
 import NfcSdk from 'gimly-ssi-nfc-react-native';
 
-NfcSdk.getStoredCredential(cardId, credentialId).then(credentials => {
+NfcSdk.files.getStoredCredential(credentialId).then(credentials => {
   // handle credentials
 }).catch(error => {
   // handle error
@@ -262,8 +247,7 @@ NfcSdk.getStoredCredential(cardId, credentialId).then(credentials => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**cardId** | **String** | The Id of a card | Optional. Default to null.
-**credentialId** | **String** | The Id of a credential | Optional. Default to null.
+**fileName** | **String** | The name of a credential |       |
 
 
 ### Return type
@@ -277,7 +261,7 @@ Verified Credentials that are self-issued as well as externally issued with a su
 ```
 import NfcSdk from 'gimly-ssi-nfc-react-native';
 
-NfcSdk.deleteStoredCredential(credentialId, cardId).then(() => {
+NfcSdk.files.deleteStoredCredential(credentialId).then(() => {
   // handle success
 }).catch(error => {
   // handle error
@@ -290,8 +274,6 @@ NfcSdk.deleteStoredCredential(credentialId, cardId).then(() => {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **credentialId** | **String** | The Id of a credential | Optional. Default to null.
-**cardId** | **String** | The Id of a card | Optional. Default to null.
-
 
 ### Return type
 
@@ -304,7 +286,7 @@ If an Access code is set on the card, all commands, including Scan Card, will re
 ```
 import NfcSdk from 'gimly-ssi-nfc-react-native';
 
-NfcSdk.setAccessCode(accessCode, cardId).then(credentials => {
+NfcSdk.wallet.setAccessCode(accessCode).then(credentials => {
   // handle response
 }).catch(error => {
   // handle error
@@ -315,7 +297,6 @@ NfcSdk.setAccessCode(accessCode, cardId).then(credentials => {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **accessCode** | **String**   | The access code  |
-**cardId**     | **String**   | The Id of a card |
 
 ### Return type
 
@@ -328,7 +309,7 @@ Passcode protects signing and operations that can alter security parameters. The
 ```
 import NfcSdk from 'gimly-ssi-nfc-react-native';
 
-NfcSdk.setPasscode(passcode, cardId).then(credentials => {
+NfcSdk.wallet.setPasscode(passcode).then(credentials => {
   // handle response
 }).catch(error => {
   // handle error
@@ -338,8 +319,7 @@ NfcSdk.setPasscode(passcode, cardId).then(credentials => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**passcode** | **String**   | The pass code  |
-**cardId**     | **String**   | The Id of a card |
+**passcode** | **String**   | The pass code
 
 ### Return type
 
@@ -352,7 +332,25 @@ Reset both access code and passcode if they were set.
 ```
 import NfcSdk from 'gimly-ssi-nfc-react-native';
 
-NfcSdk.resetUserCodes(cardId).then(credentials => {
+NfcSdk.wallet.resetUserCodes().then(credentials => {
+  // handle response
+}).catch(error => {
+  // handle error
+})
+```
+
+### Return type
+
+[**SuccessResponse**](src/types/SuccessResponse.md)
+
+
+# Store Credential
+Stores a credential a credential on the card
+
+```
+import NfcSdk from 'gimly-ssi-nfc-react-native';
+
+NfcSdk.files.storeCredential(files).then(() => {
   // handle response
 }).catch(error => {
   // handle error
@@ -363,7 +361,9 @@ NfcSdk.resetUserCodes(cardId).then(credentials => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**cardId**     | **String**   | The Id of a card |
+**credential** | **String** |The data to be stored.
+**fileName** | String | The file name.
+**fileCounter** | Number | The file name.
 
 ### Return type
 

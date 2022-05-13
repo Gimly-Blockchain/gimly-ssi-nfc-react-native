@@ -1,12 +1,12 @@
 import type { CredentialSubject, CredentialStatus, Proof } from './index';
 export declare type VerifiableCredential = {
     issuanceDate: string;
-    proof: Proof;
-    "@context": [];
+    proof?: Proof;
+    "@context": string[];
     id: string;
-    type: [];
+    type: string[];
     credentialSubject: CredentialSubject;
     issuer: string;
-    expirationDate: string;
-    credentialStatus: CredentialStatus;
+    expirationDate?: string;
+    credentialStatus?: CredentialStatus;
 };

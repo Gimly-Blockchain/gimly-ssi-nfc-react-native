@@ -1,32 +1,37 @@
-import TangemSdk from 'tangem-sdk-react-native';
+import TangemSdk from 'tangem-sdk';
+import { EllipticCurve, FileVisibility, OwnerFile } from 'tangem-sdk';
 import type {
-  SuccessResponse,
-  Message,
-  File
-} from 'tangem-sdk-react-native';
-
-import { EllipticCurve } from 'tangem-sdk-react-native';
-
-import type {
-  CardInfoResult,
-  CardInfo,
-  KeyInfo,
-  KeyResults,
-  SignCredentialRequest,
-  SignCredentialResponse,
-  SignPresentationRequest,
-  SignPresentationResponse,
-  SignRequest,
-  SignResponse,
-  StoredCredentialsResponse,
-  VerifiableCredential,
-  StoredCredentialResponse,
-  SignOutputFromInput,
+    CardInfo,
+    CardInfoResult,
+    KeyInfo,
+    KeyResults,
+    SignCredentialRequest,
+    SignCredentialResponse,
+    SignOutputFromInput,
+    SignPresentationRequest,
+    SignPresentationResponse,
+    SignRequest,
+    SignResponse,
+    StoredCredentialsResponse,
+    WalletType,
+    SsiType,
+    FilesType,
+    Message,
+    SuccessResponse,
 } from './types';
+import Sign from './signing';
 
 export const NfcSdkModule = TangemSdk;
 
 export default class NfcSdk {
+  /**
+   *  Constructor for reusable parameters
+   *
+   * @param cardId the card identifier is store globally
+   * @returns nothing
+   */
+  public static cardId: string;
+  public static keyId: string;
 
   /**
    * Scan the NFC card
@@ -34,148 +39,158 @@ export default class NfcSdk {
    * @param initialMessage The message to display
    * @returns The card information retrieved with the scan
    */
-  public static async scanCard(
-    initialMessage?: Message,
-  ): Promise<CardInfoResult> {
-    const data = await TangemSdk.scanCard(initialMessage);
+  static async scanCard(initialMessage?: Message): Promise<CardInfoResult> {
+      const data = await TangemSdk.scanCard(initialMessage);
 
-    const {
-      cardId,
-      batchId,
-      cardPublicKey: cardPublicKeyMultibase,
-      supportedCurves: curves,
-      firmwareVersion: {major, minor, type, hotFix: patch},
-    } = data;
+      const {
+          cardId,
+          batchId,
+          cardPublicKey: cardPublicKeyMultibase,
+          supportedCurves: curves,
+          firmwareVersion: { major, minor, type, hotFix: patch },
+      } = data;
 
-    const cardInfo: CardInfo = {
-      curves,
-      firmwareVersion: {
-        major,
-        minor,
-        type,
-        patch,
-      },
-    };
+      const cardInfo: CardInfo = {
+          curves,
+          firmwareVersion: {
+              major,
+              minor,
+              type,
+              patch,
+          },
+      };
 
-    const response: CardInfoResult = {
-      cardId,
-      batchId,
-      cardPublicKeyMultibase,
-      cardInfo
-    };
+      NfcSdk.cardId = cardId;
 
-    return response;
+      const response: CardInfoResult = {
+          cardId,
+          batchId,
+          cardPublicKeyMultibase,
+          cardInfo,
+      };
+
+      return response;
   }
 
   /**
    * Create an asymmetric keypair on the NFC card
    *
-   * @param cardId The Id of a card
    * @param curve A string with the elliptic Curve
    * @returns The results of the created key
    */
-  public static async createKey(
-    cardId: string,
-    curve: string,
-  ): Promise<KeyResults> {
+  static async createKey(curve: string): Promise<KeyResults> {
+      if (!NfcSdk.cardId) {
+          throw new Error('Please use scanCard first');
+      }
 
-    let ellipticCurve = EllipticCurve.Secp256k1; //default
-    if (curve === 'secp256k1') ellipticCurve = EllipticCurve.Secp256k1;
-    if (curve === 'ed25519') ellipticCurve = EllipticCurve.Ed25519;
-    if (curve === 'secp256r1') ellipticCurve = EllipticCurve.Secp256r1;
+      let ellipticCurve = EllipticCurve.Secp256k1; //default
 
-    const data = await TangemSdk.createWallet(ellipticCurve, cardId);
+      if (curve === 'secp256k1') ellipticCurve = EllipticCurve.Secp256k1;
+      if (curve === 'ed25519') ellipticCurve = EllipticCurve.Ed25519;
+      if (curve === 'secp256r1') ellipticCurve = EllipticCurve.Secp256r1;
 
-    const keyInfo: KeyInfo = {
-      publicKeyMultibase: data.wallet.publicKey,
-      index: data.wallet.index
-    };
+      const data = await TangemSdk.createWallet(ellipticCurve, NfcSdk.cardId);
 
-    const response: KeyResults = {
-      id: data.cardId,
-      keys: [keyInfo]
-    };
+      const keyInfo: KeyInfo = {
+          publicKeyMultibase: data.wallet.publicKey,
+          index: data.wallet.index,
+      };
 
-    return response;
+      const response: KeyResults = {
+          id: data.cardId,
+          keys: [keyInfo],
+      };
+
+      NfcSdk.keyId = keyInfo.publicKeyMultibase;
+
+      return response;
   }
 
   /**
    * Deactivate a key by card index, public key, or DID key
    *
-   * @param cardId The Id of a card
    * @param keyId The Key index, public key, or DID/Verification method Key ID
    * @returns null
    */
-  public static async deactivateKey(
-    cardId: string,
-    keyId: string,
-  ): Promise<SuccessResponse | null>  {
+  static async deactivateKey(keyId?: string): Promise<SuccessResponse | null> {
+      if (!NfcSdk.cardId) {
+          throw new Error('Please use scanCard first');
+      }
 
-    const response: SuccessResponse = await TangemSdk.purgeWallet(keyId, cardId);
+      if (!keyId && !NfcSdk.keyId) {
+          throw new Error('keyId not provided, please use getKeys first');
+      }
 
-    return response;
+      const response = await TangemSdk.purgeWallet(
+          keyId || NfcSdk.keyId,
+          NfcSdk.cardId
+      );
+
+      return response;
   }
 
   /**
-   * Get all keys by card Id
+   * Get all the keys of the card
    *
    * @param initialMessage The message to display
-   * @param cardId The Id of a card
    * @returns The keys retrieved from the card
    */
-  public static async getKeys(
-    initialMessage: Message,
-    cardId?: string,
-  ): Promise<KeyResults> {
+  static async getKeys(initialMessage: Message): Promise<KeyResults> {
+      const data = await TangemSdk.scanCard(initialMessage);
 
-    console.log(cardId) //TODO: what should we do with the cardId
-    const data = await TangemSdk.scanCard(initialMessage);
+      const keys = data.wallets
+          ? data.wallets.map((wallet: { publicKey: any; index: any }) => {
+              const keyInfo: KeyInfo = {
+                  publicKeyMultibase: wallet.publicKey,
+                  index: wallet.index,
+              };
 
-    const keys = data.wallets
-      ? data.wallets.map(wallet => {
-          const keyInfo: KeyInfo = {
-            publicKeyMultibase: wallet.publicKey,
-            index: wallet.index
-          };
+              return keyInfo;
+          })
+          : [];
 
-          return keyInfo;
-        })
-      : [];
+      const response: KeyResults = {
+          id: data.cardId,
+          keys,
+      };
 
-    const response: KeyResults = {
-      id: data.cardId,
-      keys,
-    };
+      if (response.keys.length > 0) {
+          NfcSdk.keyId = response.keys[0].publicKeyMultibase;
+      }
 
-    return response;
+      return response;
   }
 
   /**
-   * Get a key by Card Id and keyId
+   * Get a key by keyId
    *
    * @param initialMessage The message to display
-   * @param cardId The Id of a card
    * @param keyId The Id of a key
    * @returns The key retrieved from the card
    */
-  public static async getKey(
-    initialMessage: Message,
-    cardId: string,
-    keyId: string,
-  ): Promise<KeyInfo|null> {
-    const keyResult: KeyResults = await this.getKeys(initialMessage, cardId);
-    const {keys} = keyResult;
+  static async getKey(
+      initialMessage: Message,
+      keyId?: string
+  ): Promise<KeyInfo | null> {
+      if (!keyId && !NfcSdk.keyId) {
+          throw new Error('keyId not provided, please use getKeys first');
+      }
 
-    const filtered = keys.filter((k: KeyInfo) => k.publicKeyMultibase === keyId);
+      const keyResult: KeyResults = await this.getKeys(initialMessage);
+      const { keys } = keyResult;
 
-    if (filtered.length === 0) return null;
+      const filtered = keys.filter(
+          (k: KeyInfo) => k.publicKeyMultibase === (keyId || NfcSdk.keyId)
+      );
 
-    const keyInfo: KeyInfo = {
-      publicKeyMultibase: filtered[0].publicKeyMultibase,
-      index: filtered[0].index
-    };
+      if (filtered.length === 0) return null;
 
-    return keyInfo;
+      const keyInfo: KeyInfo = {
+          publicKeyMultibase: filtered[0].publicKeyMultibase,
+          index: filtered[0].index,
+      };
+
+      return keyInfo;
   }
 
   /**
@@ -183,278 +198,319 @@ export default class NfcSdk {
    *
    * @param keyId The Id of a key
    * @param signRequest Sign one or more inputs, typically hashes in hex format
-   * @param cardId The Id of a card
    * @returns A successful response after signing or an error
    */
-  public static async signUsingKey(
-    keyId: string,
-    signRequest: SignRequest,
-    cardId: string,
+  static async signUsingKey(
+      signRequest: SignRequest,
+      keyId?: string
   ): Promise<SignResponse> {
+      if (!NfcSdk.cardId) {
+          throw new Error('Please use scanCard first');
+      }
 
-    const {inputs} = signRequest;
-    const hashes = inputs.map(input => input.data);
-    const data = await TangemSdk.signHashes(hashes, keyId, cardId);
+      if (!keyId && !NfcSdk.keyId) {
+          throw new Error('keyId not provided, please use getKeys first');
+      }
 
-    const signatures: SignOutputFromInput[] = data?.signatures.map(
-      (signature: string, index: number) => {
-        return {
-          input: {data: hashes[index], encoding: 'hex'},
-          output: {data: signature, encoding: 'hex'},
-        };
-      },
-    )
+      const { inputs } = signRequest;
+      const hashes = inputs.map((input) => input.data);
+      const data = await TangemSdk.signHashes(
+          hashes,
+          keyId || NfcSdk.keyId,
+          NfcSdk.cardId
+      );
 
-    const response: SignResponse = {
-      publicKeyMultibase: keyId,
-      signatures,
-    };
+      // @ts-ignore
+      const signatures: SignOutputFromInput[] = data.signatures.map(
+          (signature: string, index: number) => {
+              return {
+                  input: { data: hashes[index], encoding: 'hex' },
+                  output: { data: signature, encoding: 'hex' },
+              };
+          }
+      );
 
-    return response;
+      const response: SignResponse = {
+          publicKeyMultibase: keyId,
+          signatures,
+      };
+
+      return response;
   }
 
   /**
-   * Add a proof to the supplied credential, using the private key on the NFC card and thus making it a Verifiable Credential. It allows for optional storage of the VC on the NFC card
+   * Add a proof to the supplied credential, using the private key on the NFC card and thus making
+   * it a Verifiable Credential. It allows for optional storage of the VC on the NFC card
    *
-   * @param keyId The Id of a key
    * @param signCredentialRequest Signs one or more inputs, typically hashes in hex format
-   * @param cardId The Id of a card
+   * @param keyId The Id of a key
    * @returns A success response after signing
    */
-  public static async signCredential(
-    keyId: string,
-    signCredentialRequest: SignCredentialRequest,
-    cardId: string,
-  ): Promise<SignCredentialResponse|null> {
+  static async signCredential(
+      signCredentialRequest: SignCredentialRequest,
+      keyId?: string
+  ): Promise<SignCredentialResponse | null> {
+      if (!NfcSdk.cardId) {
+          throw new Error('Please use scanCard first');
+      }
 
-    const file: File = {
-      data: JSON.stringify(signCredentialRequest.credential),
-    }
+      if (!keyId && !NfcSdk.keyId) {
+          throw new Error('keyId not provided, please use getKeys first');
+      }
 
-    const files: File[] = [file];
+      const signedCredential = Sign.credential(signCredentialRequest.credential, keyId || NfcSdk.keyId);
 
-    try {
-      const requestResponse = await TangemSdk.writeOwnerFile(files, keyId, cardId)
-      console.log(requestResponse)
-      return {
-        verifiableCredential:  {
-          issuanceDate: '',
-          proof:  {
-            type: '',
-            created: '',
-            proofPurpose: '',
-            verificationMethod: '',
-            jws: '',
-          },
-          "@context": [],
-          id: '',
-          type: [],
-          credentialSubject: { id: ''},
-          issuer: '',
-          expirationDate: '',
-          credentialStatus:  {
-            id: '',
-            type: '',
-          },
-        },
-        storageId: '',
-      };
-    } catch (err) {
-      console.log(err);
-      return null;
-    }
+      return signedCredential;
   }
 
   /**
-   * Sign the supplied presentation using the key on the NFC card, adding a proof and making it a verifiable presentation
+   * Sign the supplied presentation using the key on the NFC card, adding a proof and making it
+   * a verifiable presentation
    *
-   * @param keyId The Id of a key
    * @param signPresentationRequest Signs a presentation
-   * @param cardId The Id of a card
+   * @param keyId The Id of a key
    * @returns A successful response after signing
    */
-  public static async signPresentation(
-    keyId: string,
-    signPresentationRequest: SignPresentationRequest,
-    cardId: string,
+  static async signPresentation(
+      signPresentationRequest: SignPresentationRequest,
+      keyId?: string
   ): Promise<SignPresentationResponse> {
-    console.log(keyId, signPresentationRequest, cardId);
-    // TODO: Following code are hardcoded responses, expected as terminal api structure.
-    const verifiableCredential_1: VerifiableCredential = {
-      issuanceDate: '',
-      proof: {
-        type: '',
-        created: '',
-        proofPurpose: '',
-        verificationMethod: '',
-        jws: '',
-      },
-      '@context': [],
-      id: '',
-      type: [],
-      credentialSubject: {id: ''},
-      issuer: '',
-      expirationDate: '',
-      credentialStatus: {id: '', type: ''},
-    };
-    const response:SignPresentationResponse = {
-      verifiablePresentation: {
-        proof: {
-          type: '',
-          created: '',
-          proofPurpose: '',
-          verificationMethod: '',
-          jws: '',
-        },
-        "@context": [],
-        type: "",
-        verifiableCredential: [verifiableCredential_1],
+      if (!keyId && !NfcSdk.keyId) {
+          throw new Error('keyId not provided, please use getKeys first');
       }
-    }
-    return response;
+
+      const signedPresentation = Sign.presentation(
+          signPresentationRequest.presentation,
+          keyId || NfcSdk.keyId
+      );
+      return signedPresentation;
+  }
+
+  /**
+   * Store a credential
+   *
+   * @param credential The credential to be stored
+   * @param fileName The file name
+   * @returns A success response or null
+   */
+  static async storeCredential(
+      credential: any,
+      fileName: string
+  ): Promise<SuccessResponse | null> {
+      if (!NfcSdk.cardId) {
+          throw new Error('Please use scanCard first');
+      }
+
+      const sCredential = JSON.stringify(credential);
+      const data = hexEncode(sCredential);
+
+      const files = await TangemSdk.readFiles(true);
+      // @ts-ignore
+      const fileCounter = files.length + 1;
+
+      await new Promise((resolve) => setTimeout(resolve, 4000));
+
+      const { startingSignature, finalizingSignature } =
+      await TangemSdk.prepareHashes(
+          NfcSdk.cardId,
+          data,
+          fileCounter,
+          fileName,
+          '11121314151617184771ED81F2BACF57479E4735EB1405083927372D40DA9E92' // TODO hardcoded key due to a Tangem SDK limitation
+      );
+
+      const file: OwnerFile = {
+          startingSignature,
+          finalizingSignature,
+          data,
+          fileName,
+          counter: fileCounter,
+          fileVisibility: FileVisibility.Public,
+      };
+
+      const response = await TangemSdk.writeFiles([file], NfcSdk.cardId);
+
+      return response;
   }
 
   /**
    * Delete a specific stored Verifiable Credential
    *
-   * @param credentialId The Id of a credential
-   * @param cardId The Id of a card
+   * @param fileName The file name of a credential
    * @returns A successful response or null
    */
-  public static async deleteStoredCredential(
-    credentialId: string,
-    cardId: string,
+  static async deleteStoredCredential(
+      fileName: string
   ): Promise<SuccessResponse | null> {
-    console.log(credentialId)
-    // TODO: as first parameter deleteFiles espects "indicesToDelete" which is an array of numbers. Investigate or ask correlation between credentialId(string) <-> indicesToDelete(array of numbers)
-    // TODO: dummy const to bypass tsx errors
-    const indicesToDelete: number[] = []; // Indexes of files that should be deleted. If undefined - deletes all files from card
+      const files = await TangemSdk.readFiles(true, fileName);
+      // @ts-ignore
 
-    const data = await TangemSdk.deleteFiles(indicesToDelete, cardId);
-    if (data) {
-      return data;
-    }
-    return null;
+      const indices = files.map((file: { index: any }) => file.index);
+
+      await TangemSdk.deleteFiles(indices);
+
+      const response: SuccessResponse = {
+          cardId: NfcSdk.cardId,
+      };
+
+      return response;
   }
 
   /**
    * Return all the stored Verifiable Credentials
    *
-   * @param cardId The Id of a card
    * @returns The stored credentials
    */
-  public static async getStoredCredentials(
-    cardId: string,
-  ): Promise<StoredCredentialsResponse> {
-    const readPrivateFiles: boolean = true;
-    const indices = undefined;
-    const data = await TangemSdk.readFiles(readPrivateFiles, indices, cardId);
-    console.log(data);
-    // TODO: convert data to credentials as expected by terminal format
-    const response: StoredCredentialsResponse = {
-      credentials: [
-        {
-          "@context": [""],
-          id: "",
-          type: [""],
-          credentialSubject: {
-            id: ""
-          },
-          issuer: "",
-          issuanceDate: "",
-          expirationDate: "",
-          credentialStatus: {
-            id: "",
-            type: "",
-          },
-          proof: {
-            type: "",
-            created: "",
-            verificationMethod: "",
-            proofPurpose: "",
-            jws: ""
-          }
-        }
-      ]
-    }
-    return response;
+  static async getStoredCredentials(): Promise<StoredCredentialsResponse> {
+      const files = await TangemSdk.readFiles(true);
+
+      const credentials = files
+      // @ts-ignore
+          .map((item: { data: string; name: string }) => {
+              try {
+                  const decodeData = hexDecode(item.data);
+                  return JSON.parse(decodeData);
+              } catch {
+                  return null;
+              }
+          })
+          .filter((item: { data: string; name: string }) => item);
+
+      const response: StoredCredentialsResponse = { credentials };
+
+      return response;
   }
 
   /**
    * Return a specific stored Verifiable Credential
    *
-   * @param cardId The Id of a card
-   * @param credentialId  The Id of a credential
+   * @param fileName The file name of a credential
    * @returns The stored credential or null
    */
-  public static async getStoredCredential(
-    cardId: string,
-    credentialId: string,
-  ): Promise<StoredCredentialResponse|null> {
-    const data = await this.getStoredCredentials(cardId);
-    const filtered = data.credentials.filter(
-      credential => credential.id === credentialId,
-    );
-    if (filtered.length === 0) {
-      return null;
-    }
-    return {
-      credential: filtered[0],
-    };
+  static async getStoredCredential(
+      fileName: string
+  ): Promise<StoredCredentialsResponse | null> {
+      const files = await TangemSdk.readFiles(true, fileName);
+
+      const credentials = files
+      // @ts-ignore
+          .map((item: { data: string; name: string }) => {
+              try {
+                  const decodeData = hexDecode(item.data);
+                  return JSON.parse(decodeData);
+              } catch {
+                  return null;
+              }
+          })
+          .filter((item: { data: string; name: string }) => item);
+
+      const response: StoredCredentialsResponse = { credentials };
+
+      return response;
   }
 
   /**
    * Set an access code on the card, if set all commands, including Scan Card, will require to submit this code
    *
    * @param accessCode The access code
-   * @param cardId The Id of a card
    * @returns A success response or null
    */
-  public static async setAccessCode(
-    accessCode: string,
-    cardId: string,
+  static async setAccessCode(
+      accessCode: string
   ): Promise<SuccessResponse | null> {
-    const data = await TangemSdk.setAccessCode(accessCode, cardId);
-    if (data) {
+      if (!NfcSdk.cardId) {
+          throw new Error('Please use scanCard first');
+      }
+
+      const data = await TangemSdk.setAccessCode(accessCode, NfcSdk.cardId);
+
       return data;
-    }
-    return null;
   }
 
   /**
    * Set a passcode. Passcode protects signing and operations that can alter security parameters
    *
    * @param passcode The pass code
-   * @param cardId The Id of a card
    * @returns A success response or null
    */
-  public static async setPasscode(
-    passcode: string,
-    cardId: string,
-  ): Promise<SuccessResponse | null> {
-    const data = await TangemSdk.setPasscode(passcode, cardId);
-    if (data) {
+  static async setPasscode(passcode: string): Promise<SuccessResponse | null> {
+      if (!NfcSdk.cardId) {
+          throw new Error('Please use scanCard first');
+      }
+
+      const data = await TangemSdk.setPasscode(passcode, NfcSdk.cardId);
+
       return data;
-    }
-    return null;
   }
 
   /**
    * Reset both access code and passcode if they were set
    *
-   * @param cardId The Id of a card
    * @returns A success response or null
    */
-  public static async resetUserCodes(
-    cardId: string,
-  ): Promise<SuccessResponse | null> {
-    const data = await TangemSdk.resetUserCodes(cardId);
-    if (data) {
+  static async resetUserCodes(): Promise<SuccessResponse | null> {
+      if (!NfcSdk.cardId) {
+          throw new Error('Please use scanCard first');
+      }
+
+      const data = await TangemSdk.resetUserCodes(NfcSdk.cardId);
+
       return data;
-    }
-    return null;
   }
+
+  /**
+   * Exposes public methods related to wallet operations
+   */
+  public static wallet: WalletType = {
+      scanCard: NfcSdk.scanCard,
+      setAccessCode: NfcSdk.setAccessCode,
+      setPasscode: NfcSdk.setPasscode,
+      resetUserCodes: NfcSdk.resetUserCodes,
+      createKey: NfcSdk.createKey,
+      getKeys: NfcSdk.getKeys,
+      getKey: NfcSdk.getKey,
+      deactivateKey: NfcSdk.deactivateKey,
+  };
+
+  /**
+   * Exposes public methods related to ssi operation
+   */
+  public static ssi: SsiType = {
+      signUsingKey: NfcSdk.signUsingKey,
+      signCredential: NfcSdk.signCredential,
+      signPresentation: NfcSdk.signPresentation,
+  };
+
+  /**
+   * Exposes public methods related to wallet operations
+   */
+  public static files: FilesType = {
+      storeCredential: NfcSdk.storeCredential,
+      getStoredCredentials: NfcSdk.getStoredCredentials,
+      getStoredCredential: NfcSdk.getStoredCredential,
+      deleteStoredCredential: NfcSdk.deleteStoredCredential,
+  };
 }
 
+// TODO: REFACTOR. Move the following 3 methods to a separate file with common functions
+const hexEncode = (input: string): string => {
+    const json = JSON.stringify(input);
+    const response = json
+        .split('')
+        .map((_c, i) => ('000' + json.charCodeAt(i).toString(16)).slice(-4))
+        .join('');
+
+    return response;
+};
+
+const hexDecode = (input: string): string => {
+    const hexes = input.match(/.{1,4}/g) || [];
+    const response = hexes
+        .map((c) => String.fromCharCode(parseInt(c, 16)))
+        .join('');
+
+    return response;
+};
+
 export * from './types';
-export { EllipticCurve } from 'tangem-sdk-react-native';
+export { EllipticCurve } from 'tangem-sdk';

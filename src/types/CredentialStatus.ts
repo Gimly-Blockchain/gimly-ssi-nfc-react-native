@@ -1,5 +1,4 @@
-
 export type CredentialStatus = {
-  id: string,
-  type: string,
+  id: string;
+  type: string;
 };

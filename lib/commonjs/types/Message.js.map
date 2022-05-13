@@ -1,0 +1,1 @@
+{"version":3,"names":[],"sources":["Message.ts"],"sourcesContent":["export type Message = {\n  body?: string;\n  header?: string;\n};\n"],"mappings":""}

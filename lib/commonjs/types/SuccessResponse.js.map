@@ -1,0 +1,1 @@
+{"version":3,"names":[],"sources":["SuccessResponse.ts"],"sourcesContent":["export type SuccessResponse = {\n  cardId: string,\n};\n"],"mappings":""}

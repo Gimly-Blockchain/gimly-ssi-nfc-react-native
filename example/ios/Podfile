@@ -12,7 +12,7 @@ target 'gimlySdkTester' do
     :hermes_enabled => false
   )
 
-  pod 'tangem-sdk-react-native', :path => '../node_modules/tangem-sdk-react-native'
+  pod 'tangem-sdk-react-native', :path => '../node_modules/tangem-sdk'
 
   target 'gimlySdkTesterTests' do
     inherit! :complete

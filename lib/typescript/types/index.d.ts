@@ -1,4 +1,3 @@
-export type { Message } from 'tangem-sdk-react-native';
 export * from './CardInfo';
 export * from './CardInfoResult';
 export * from './Curve';
@@ -24,3 +23,8 @@ export * from './StoredCredentialsResponse';
 export * from './Credential';
 export * from './StoredCredentialResponse';
 export * from './VerifiablePresentation';
+export * from './WalletType';
+export * from './SsiType';
+export * from './FilesType';
+export * from './Message';
+export * from './SuccessResponse';

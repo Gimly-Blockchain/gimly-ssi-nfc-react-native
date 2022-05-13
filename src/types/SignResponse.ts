@@ -1,6 +1,6 @@
 import type { SignOutputFromInput } from './index';
 
 export type SignResponse = {
-  publicKeyMultibase: String,
+  publicKeyMultibase: string | undefined,
   signatures: SignOutputFromInput[]
 };

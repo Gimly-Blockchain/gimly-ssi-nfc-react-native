@@ -1,1 +1,1 @@
-{"version":3,"names":["Curve"],"sources":["Curve.ts"],"sourcesContent":["\nexport enum Curve {\n  Secp256k1 = 'secp256k1',\n  Ed25519 = 'ed25519',\n  Secp256r1 = 'secp256r1',\n}\n"],"mappings":"AACA,WAAYA,KAAZ;;WAAYA,K;EAAAA,K;EAAAA,K;EAAAA,K;GAAAA,K,KAAAA,K"}
+{"version":3,"names":["Curve"],"sources":["Curve.ts"],"sourcesContent":["export enum Curve {\n  Secp256k1 = 'secp256k1',\n  Ed25519 = 'ed25519',\n  Secp256r1 = 'secp256r1',\n}\n"],"mappings":"AAAA,WAAYA,KAAZ;;WAAYA,K;EAAAA,K;EAAAA,K;EAAAA,K;GAAAA,K,KAAAA,K"}

@@ -1,7 +1,6 @@
-
 export type FirmwareVersion = {
-  major: number,
-  minor: number,
-  patch: number,
-  type: string
+  major: number;
+  minor: number;
+  patch: number;
+  type: string;
 };

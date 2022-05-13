@@ -1,9 +1,1 @@
-
-
-export type CredentialSubject = {
-  id: string,
-  degree?: {
-    type: string,
-    name: string
-  }
-};
+export type CredentialSubject = Object

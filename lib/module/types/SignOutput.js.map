@@ -1,1 +1,1 @@
-{"version":3,"names":[],"sources":["SignOutput.ts"],"sourcesContent":["\nexport type SignOutput = {\n  data: String,\n  encoding: {}\n};"],"mappings":""}
+{"version":3,"names":[],"sources":["SignOutput.ts"],"sourcesContent":["export type SignOutput = {\n  data: String;\n  encoding: {};\n};\n"],"mappings":""}

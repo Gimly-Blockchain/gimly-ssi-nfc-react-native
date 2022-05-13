@@ -7,10 +7,10 @@
 
 const path = require('path');
 const extraNodeModules = {
-  'src': path.resolve(__dirname + '/../src'),
+  'local': path.resolve(__dirname + '/../'),
 };
 const watchFolders = [
-  path.resolve(__dirname + '/../src')
+  path.resolve(__dirname + '/..')
 ];
 module.exports = {
   transformer: {

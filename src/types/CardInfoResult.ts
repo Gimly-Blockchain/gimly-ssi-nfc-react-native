@@ -1,8 +1,8 @@
-import type { CardInfo } from './CardInfo'
+import type { CardInfo } from './CardInfo';
 
 export type CardInfoResult = {
-  cardId: string,
-  batchId: String,
-  cardPublicKeyMultibase: String,
-  cardInfo: CardInfo
+  cardId: string;
+  batchId: String;
+  cardPublicKeyMultibase: String;
+  cardInfo: CardInfo;
 };
