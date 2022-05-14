@@ -11,4 +11,6 @@ export type SsiType = {
   signUsingKey: (signRequest: SignRequest, keyId?: string | undefined) => Promise<SignResponse>;
   signCredential: (signCredentialRequest: SignCredentialRequest, keyId?: string | undefined) => Promise<SignCredentialResponse | null>;
   signPresentation: (signPresentationRequest: SignPresentationRequest, keyId?: string | undefined) => Promise<SignPresentationResponse>;
+  verifyCredential: (signCredentialRequest: SignCredentialRequest) => Promise<boolean | null>
+  // verifyPresentation: (signPresentationRequest: SignCredentialRequest) => Promise<boolean | null>
 };
