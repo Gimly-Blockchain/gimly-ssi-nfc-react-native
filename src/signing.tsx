@@ -36,20 +36,19 @@ export default class Sign {
       type: 'Ed25519VerificationKey2020',
       controller: controller,
       id: controller + '#controllerKey',
-      publicKeyMultibase: 'z6MknCCLeeHBUaHu4aHSVLDCYQW9gjVJ7a63FpMvtuVMy53T',
-      privateKeyMultibase:
-        'zrv2EET2WWZ8T1Jbg4fEH5cQxhbUS22XxdweypUbjWVzv1YD6VqYu' +
-        'W6LH7heQCNYQCuoKaDwvv2qCWz3uBzG2xesqmf',
     });
 
     const suite = new Ed25519Signature2020({ key: keyPair });
 
     suite.signer = {
       async sign({ data }: any) {
-        console.log('data', data.toString('hex'));
-        const response = await TangemSdk.signHashes([data.toString('hex')], keyId, cardId);
-        console.log('response', response);
-        return data;
+        const dataHash = Array.from(data)
+        // @ts-ignore
+        .map((byte) => byte.toString(16).padStart(2, '0'))
+          .join('');
+        const response = await TangemSdk.signHashes([dataHash], keyId, cardId);
+        // @ts-ignore
+        return response.signature;
       },
       id: keyPair.id,
     };
