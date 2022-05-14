@@ -1,3 +1,4 @@
+// @ts-ignore
 import 'text-encoding-polyfill';
 // @ts-ignore
 import vc from '@digitalcredentials/vc';
@@ -13,9 +14,9 @@ import documentLoaderXhr from '@digitalcredentials/jsonld/lib/documentLoaders/xh
 import { frame } from '@digitalcredentials/jsonld';
 // @ts-ignore
 import jsonld from '@digitalcredentials/jsonld';
-
+// @ts-ignore
 import TangemSdk from 'tangem-sdk';
-
+// @ts-ignore
 import type { Credential, Presentation } from './types';
 
 export default class Sign {
