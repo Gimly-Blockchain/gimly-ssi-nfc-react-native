@@ -1,1 +1,1 @@
-{"version":3,"names":[],"sources":["SignPresentationRequest.ts"],"sourcesContent":["import type { Presentation } from './index'\n\nexport type SignPresentationRequest = {\n  presentation: Presentation,\n};"],"mappings":""}
+{"version":3,"names":[],"sources":["SignPresentationRequest.ts"],"sourcesContent":["import type { Presentation } from './index'\n\nexport type SignPresentationRequest = {\n  presentation: Presentation,\n  controller: string,\n  challenge: string\n};"],"mappings":""}

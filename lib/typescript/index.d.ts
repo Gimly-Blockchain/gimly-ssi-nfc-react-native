@@ -59,18 +59,35 @@ export default class NfcSdk {
      *
      * @param signCredentialRequest Signs one or more inputs, typically hashes in hex format
      * @param keyId The Id of a key
+     * @param controller The DID of the controller
      * @returns A success response after signing
      */
     static signCredential(signCredentialRequest: SignCredentialRequest, keyId?: string): Promise<SignCredentialResponse | null>;
+    /**
+     * Verify a credential
+     *
+     * @param signedCredential a signed credential
+     * @returns wheter the credential is valid or not
+     */
+    static verifyCredential(signCredentialRequest: SignCredentialRequest): Promise<boolean | null>;
     /**
      * Sign the supplied presentation using the key on the NFC card, adding a proof and making it
      * a verifiable presentation
      *
      * @param signPresentationRequest Signs a presentation
      * @param keyId The Id of a key
+     * @param controller The DID of the controller
+     * @param challenge The presentation challenge
      * @returns A successful response after signing
      */
     static signPresentation(signPresentationRequest: SignPresentationRequest, keyId?: string): Promise<SignPresentationResponse>;
+    /**
+     * Verifies a presentation
+     *
+     * @param signedPresentation A signed presentation
+     * @returns wheter the credential is valid or not
+     */
+    static verifyPresentation(signPresentationRequest: SignPresentationRequest): Promise<boolean | null>;
     /**
      * Store a credential
      *
