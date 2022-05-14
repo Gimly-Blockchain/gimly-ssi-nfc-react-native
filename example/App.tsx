@@ -5,7 +5,6 @@
  * @format
  * @flow strict-local
  */
-
 import React, { useState, useRef } from 'react';
 import type { ViewStyle } from 'react-native';
 import {
@@ -20,6 +19,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
+import PolyfillCrypto from 'react-native-webview-crypto'
 import NfcSdk, { EllipticCurve } from './src'; // change to 'src' to use local files or gimly-ssi-nfc-react-native
 import type {
   Message,
@@ -118,10 +118,10 @@ const App = () => {
   };
 
   const testCreateKey = async () => {
-    addLog('createKey', `curve=secp256k1`, 'INPUT');
-    const curve = 'secp256k1';
+    addLog('createKey', `curve=ed25519`, 'INPUT');
+    const curve = 'ed25519';
     try {
-      const response = await NfcSdk.wallet.createKey(EllipticCurve.Secp256k1);
+      const response = await NfcSdk.wallet.createKey(EllipticCurve.Ed25519);
 
       setKeyId(response.keys[0].publicKeyMultibase);
       addLog('', JSON.stringify(response, null, 2), 'OUTPUT');
@@ -229,6 +229,7 @@ const App = () => {
 
     const signCredentialRequest: SignCredentialRequest = {
       credential,
+      controller: 'did:ethr:ropsten:0x02e9b18ecde0171ab0ea7b376b2922249441630a90b9f52de95642db7773fb6702',
       store: true,
     };
 
@@ -246,16 +247,22 @@ const App = () => {
         signCredentialRequest,
         keyIdCurrent
       );
-      //console.log('response', JSON.stringify(response, null, 2));
       addLog('', JSON.stringify(response, null, 2), 'OUTPUT');
+      return response
     } catch (error) {
       addLog('', error.message, 'OUTPUT');
     }
   };
 
-  const testSignPresentation = async () => {
-    console.log('TEST signPresentation');
+  const testVerifyCredential = async () => {
+    addLog('verifyCredential', ``, 'INPUT');
+    // const signedCredential = await testSignCredential()
+    // addLog('verifyCredential', `VC generated, verifying...`, 'INPUT');
+    // const response = await NfcSdk.ssi.verifyCredential(signedCredential);
+    // addLog('verifyCredential', `valid: ${response}`, 'OUTPUT');
+  }
 
+  const testSignPresentation = async () => {
     const presentation: Presentation = {
       "@context": [
         "https://www.w3.org/2018/credentials/v1"
@@ -295,10 +302,13 @@ const App = () => {
     };
 
     const signPresentationRequest: SignPresentationRequest = {
-      presentation
+      presentation,
+      controller: 'did:ethr:ropsten:0x02e9b18ecde0171ab0ea7b376b2922249441630a90b9f52de95642db7773fb6702',
+      challenge: '1234'
     };
-    const keyId =
-      '02EE0265FB7B23F19739CD9706E332209E28BB10C046DB0F984DF24A8B877BCA40';
+
+    let keyIdCurrent = keyId;
+
     addLog(
       'signPresentation',
       `keyId: ${keyId}, signPresentationRequest: ${JSON.stringify(
@@ -311,14 +321,22 @@ const App = () => {
     try {
       const response = await NfcSdk.ssi.signPresentation(
         signPresentationRequest,
-        keyId
+        keyIdCurrent,
       );
-      console.log('response', JSON.stringify(response, null, 2));
       addLog('', JSON.stringify(response, null, 2), 'OUTPUT');
+      return response
     } catch (error) {
       addLog('', error.message, 'OUTPUT');
     }
   };
+
+  const testVerifyPresentation = async () => {
+    addLog('verifyPresentation', ``, 'INPUT');
+    // const signedPresentation = await testSignPresentation()
+    // addLog('verifyPresentation', `VP generated, verifying...`, 'INPUT');
+    // const response = await NfcSdk.ssi.verifyPresentation(signedPresentation);
+    // addLog('verifyPresentation', `valid: ${response}`, 'OUTPUT');
+  }
 
   const testStoreCredential = async () => {
     // example: https://w3c-ccg.github.io/vc-examples/edu/university-degree-verifiable-credential.json
@@ -420,6 +438,7 @@ const App = () => {
 
   return (
     <SafeAreaView style={backgroundStyle}>
+      <PolyfillCrypto/>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
 
       <View style={containerStyle}>
@@ -440,8 +459,9 @@ const App = () => {
               <Text style={styles.logW}>{`> `}</Text>
               <Text style={styles.logW}>Logs will display here</Text>
             </View>
-            {logs.map((log) => (
+            {logs.map((log, idx) => (
               <LogElement
+                key={idx+1}
                 method={log.method}
                 params={log.params}
                 type={log.type}
@@ -524,6 +544,12 @@ const App = () => {
                     onPress={testSignPresentation}
                     title="signPresentation"
                   />
+                </View>
+                <View style={styles.button}>
+                  <Button onPress={testVerifyCredential} title="verifyCredential" />
+                </View>
+                <View style={styles.button}>
+                  <Button onPress={testVerifyPresentation} title="verifyPresentation" />
                 </View>
               </View>
             )}

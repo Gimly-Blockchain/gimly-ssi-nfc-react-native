@@ -1,3 +1,4 @@
+import 'text-encoding-polyfill';
 // @ts-ignore
 import vc from '@digitalcredentials/vc';
 // @ts-ignore
@@ -13,116 +14,136 @@ import { frame } from '@digitalcredentials/jsonld';
 // @ts-ignore
 import jsonld from '@digitalcredentials/jsonld';
 
+import TangemSdk from 'tangem-sdk';
+
 import type { Credential, Presentation } from './types';
 
 export default class Sign {
-    /**
+  /**
    * Gets the suit required to sign
    *
-   * @param
+   * @param cardId the card Id
+   * @param keyId the public key
    * @returns The suit
    */
-    private static async getSuite(keyId: string) {
-    // TODO This suite is just for testing purposes
-        const controller = 'https://example.edu/issuers/565049';
+  private static async getSuite(
+    cardId: string,
+    keyId: string,
+    controller?: string
+  ) {
+    const keyPair = await Ed25519VerificationKey2020.from({
+      type: 'Ed25519VerificationKey2020',
+      controller: controller,
+      id: controller + '#controllerKey',
+      publicKeyMultibase: 'z6MknCCLeeHBUaHu4aHSVLDCYQW9gjVJ7a63FpMvtuVMy53T',
+      privateKeyMultibase:
+        'zrv2EET2WWZ8T1Jbg4fEH5cQxhbUS22XxdweypUbjWVzv1YD6VqYu' +
+        'W6LH7heQCNYQCuoKaDwvv2qCWz3uBzG2xesqmf',
+    });
 
-        const keyPair = await Ed25519VerificationKey2020.from({
-            type: 'Ed25519VerificationKey2020',
-            controller,
-            id: controller + '#' + keyId,
-            publicKeyMultibase: keyId,
-        });
+    const suite = new Ed25519Signature2020({ key: keyPair });
 
-        const suite = new Ed25519Signature2020({ key: keyPair });
-        suite.date = '2010-01-01T19:23:24Z';
+    suite.signer = {
+      async sign({ data }: any) {
+        console.log('data', data.toString('hex'));
+        const response = await TangemSdk.signHashes([data.toString('hex')], keyId, cardId);
+        console.log('response', response);
+        return data;
+      },
+      id: keyPair.id,
+    };
 
-        return suite;
-    }
+    suite.date = new Date().toISOString();
 
-    /**
+    return suite;
+  }
+
+  /**
    * Gets the document
    *
    * @param url the document url
    * @returns The suit
    */
-    private static async documentLoader(url: string) {
-        if (url.startsWith('did:')) {
-            const didResolver = new UniResolver();
-            const result = await didResolver.resolve(url);
+  private static async documentLoader(url: string) {
+    if (url && url.startsWith('did:')) {
+      const didResolver = new UniResolver();
+      const result = await didResolver.resolve(url);
 
-            if (result.didResolutionMetadata.error || !result.didDocument) {
-                throw new Error(`Unable to resolve DID: ${url}`);
-            }
+      if (result.didResolutionMetadata.error || !result.didDocument) {
+        throw new Error(`Unable to resolve DID: ${url}`);
+      }
 
-            const framed = await frame(
-                'https://identity.foundation/EcdsaSecp256k1RecoverySignature2020/lds-ecdsa-secp256k1-recovery2020-0.0.jsonld',
-                {
-                    '@context': result.didDocument['@context'],
-                    '@embed': '@never',
-                    'id': url,
-                }
-            );
+      const framed = await frame(result.didDocument, {
+        '@context': result.didDocument['@context'],
+        '@embed': '@never',
+        'id': url,
+      });
 
-            return {
-                contextUrl: null,
-                documentUrl: url,
-                document: framed,
-            };
-        }
-
-        const loader = documentLoaderXhr.apply(jsonld, []);
-        const response = await loader(url);
-
-        return response;
+      return {
+        contextUrl: null,
+        documentUrl: url,
+        document: framed,
+      };
     }
 
-    /**
+    const loader = documentLoaderXhr.apply(jsonld, []);
+    const response = await loader(url);
+
+    return response;
+  }
+
+  /**
    * Sign the credential
    *
    * @param
    * @returns The signed credential
    */
-    public static async credential(unsignedCredential: Credential, keyId: string): Promise<any> {
-        const suite = await this.getSuite(keyId);
+  public static async credential(
+    unsignedCredential: Credential,
+    keyId: string,
+    cardId: string,
+    controller: string
+  ): Promise<any> {
+    const suite = await this.getSuite(cardId, keyId, controller);
 
-        try {
-            const signedCredential = await vc.issue({
-                credential: unsignedCredential,
-                suite,
-                documentLoader: this.documentLoader,
-            });
+    const signedCredential = await vc.issue({
+      credential: unsignedCredential,
+      suite,
+      documentLoader: this.documentLoader,
+    });
 
-            return signedCredential;
-        } catch (err: any) { //TODO improve error handling
-            throw new Error(err.message);
-        }
-    }
+    return signedCredential;
+  }
 
-    /**
+  /**
    * Sign the presentation
    *
    * @param
    * @returns The signed presentation
    */
-    public static async presentation(presentation: Presentation, keyId: string): Promise<any> {
-        const suite = await this.getSuite(keyId);
-        const challenge = '1234';
-
-        try {
-            const signedPresentation = await vc.signPresentation({
-                presentation,
-                suite,
-                challenge,
-                documentLoader: this.documentLoader,
-            });
-
-            return signedPresentation;
-        } catch (err: any) { //TODO improve error handling
-            throw new Error(err.message);
-        }
+  public static async presentation(
+    presentation: Presentation,
+    keyId: string,
+    cardId: string,
+    controller: string,
+    challenge: string
+  ): Promise<any> {
+    const suite = await this.getSuite(cardId, keyId, controller);
+    try {
+      const signedPresentation = await vc.signPresentation({
+        presentation,
+        suite,
+        challenge,
+        documentLoader: this.documentLoader,
+      });
+      return signedPresentation;
+    } catch (err: any) {
+      //TODO improve error handling
+      throw new Error(err.message);
     }
+  }
 
-    /**
+  /**
    * Verify a credential
    *
    * Currently in development
@@ -130,15 +151,43 @@ export default class Sign {
    * @param signedVC a signed credential
    * @returns wheter the credential is valid or not
    */
-    public static async verfyCredential(signedVC: any, keyId: string): Promise<any> {
-        const suite = await this.getSuite(keyId);
+  public static async verifyCredential(
+    signedVC: Credential,
+    keyId: string,
+    cardId: string,
+    controller: string
+  ): Promise<any> {
+    const suite = await this.getSuite(cardId, keyId, controller);
+    const result = await vc.verifyCredential({
+      credential: signedVC,
+      suite,
+      documentLoader: this.documentLoader,
+    });
+    return result;
+  }
 
-        const result = await vc.verifyCredential({
-            credential: signedVC,
-            suite,
-            documentLoader: this.documentLoader,
-        });
-
-        return result;
-    }
+  /**
+   * Verify a presentation
+   *
+   * Currently in development
+   *
+   * @param signedPresentation a signed presentation
+   * @returns wheter the presentation is valid or not
+   */
+  public static async verifyPresentation(
+    signedPresentation: Presentation,
+    keyId: string,
+    cardId: string,
+    controller: string,
+    challenge: string
+  ): Promise<any> {
+    const suite = await this.getSuite(cardId, keyId, controller);
+    const result = await vc.verify({
+      presentation: signedPresentation,
+      challenge,
+      suite,
+      documentLoader: this.documentLoader,
+    });
+    return result;
+  }
 }
