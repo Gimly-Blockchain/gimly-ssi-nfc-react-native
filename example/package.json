@@ -12,7 +12,10 @@
   "dependencies": {
     "gimly-ssi-nfc-react-native": "file:../",
     "react": "17.0.2",
-    "react-native": "0.67.1"
+    "react-native": "0.67.1",
+    "react-native-webview": "^11.18.2",
+    "react-native-webview-crypto": "^0.0.24",
+    "text-encoding-polyfill": "^0.6.7"
   },
   "devDependencies": {
     "@babel/core": "^7.17.9",
