@@ -1,6 +1,6 @@
 {
   "name": "gimly-ssi-nfc-react-native",
-  "version": "0.0.10",
+  "version": "0.1.01",
   "description": "Gimly SDK to manage NFC and SSI communication",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -25,7 +25,6 @@
     "test": "jest",
     "typescript": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
-    "prepare": "bob build",
     "release": "release-it",
     "postinstall": "patch-package"
   },
