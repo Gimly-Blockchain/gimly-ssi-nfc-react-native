@@ -22,6 +22,7 @@ module.exports = {
     }),
   },
   resolver: {
+    sourceExts: ['jsx', 'js', 'ts', 'tsx', 'cjs'],
     extraNodeModules: new Proxy(extraNodeModules, {
       get: (target, name) =>
         name in target ? target[name] : path.join(process.cwd(), `node_modules/${name}`),
