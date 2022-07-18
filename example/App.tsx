@@ -20,7 +20,7 @@ import {
 } from 'react-native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import PolyfillCrypto from 'react-native-webview-crypto'
-import NfcSdk, { EllipticCurve } from './src'; // change to 'src' to use local files or gimly-ssi-nfc-react-native
+import NfcSdk, { EllipticCurve } from 'gimly-ssi-nfc-react-native';
 import type {
   Message,
   SignInput,
@@ -29,7 +29,7 @@ import type {
   Credential,
   Presentation,
   SignPresentationRequest,
-} from './src'; // change to 'src' to use local files
+} from 'gimly-ssi-nfc-react-native';
 
 type LogItem = {
   method: string;
