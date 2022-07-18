@@ -48,6 +48,9 @@ export default class NfcSdk {
       cardPublicKey: cardPublicKeyMultibase,
       supportedCurves: curves,
       firmwareVersion: { major, minor, type, hotFix: patch },
+      isAccessCodeSet,
+      isPasscodeSet,
+      wallets
     } = data;
 
     const cardInfo: CardInfo = {
@@ -62,11 +65,29 @@ export default class NfcSdk {
 
     NfcSdk.cardId = cardId;
 
+    if (wallets && wallets.length > 0) {
+      const existingkeyId = wallets[0]?.publicKey;
+      if (existingkeyId) {
+        NfcSdk.keyId = existingkeyId;
+      }
+    }
+
+    const keys = wallets ? wallets.map((wallet: { publicKey: any; index: any }) => {
+      const keyInfo: KeyInfo = {
+        publicKeyMultibase: wallet.publicKey,
+        index: wallet.index,
+      };
+      return keyInfo;
+    }) : [];
+
     const response: CardInfoResult = {
       cardId,
       batchId,
       cardPublicKeyMultibase,
       cardInfo,
+      isAccessCodeSet,
+      isPasscodeSet,
+      keys
     };
 
     return response;

@@ -1,8 +1,12 @@
 import type { CardInfo } from './CardInfo';
+import type { KeyInfo } from './index'
 
 export type CardInfoResult = {
   cardId: string;
-  batchId: String;
-  cardPublicKeyMultibase: String;
+  batchId: string;
+  cardPublicKeyMultibase: string;
   cardInfo: CardInfo;
+  isAccessCodeSet: boolean;
+  isPasscodeSet: boolean;
+  keys: KeyInfo[],
 };
