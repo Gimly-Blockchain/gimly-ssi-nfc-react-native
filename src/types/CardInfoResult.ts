@@ -6,7 +6,7 @@ export type CardInfoResult = {
   batchId: string;
   cardPublicKeyMultibase: string;
   cardInfo: CardInfo;
-  isAccessCodeSet: boolean;
-  isPasscodeSet: boolean;
+  isAccessCodeSet?: boolean;
+  isPasscodeSet?: boolean;
   keys: KeyInfo[],
 };

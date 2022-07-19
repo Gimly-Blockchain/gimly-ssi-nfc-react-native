@@ -48,6 +48,7 @@ export default class NfcSdk {
       cardPublicKey: cardPublicKeyMultibase,
       supportedCurves: curves,
       firmwareVersion: { major, minor, type, hotFix: patch },
+      // @ts-ignore
       isAccessCodeSet,
       isPasscodeSet,
       wallets
