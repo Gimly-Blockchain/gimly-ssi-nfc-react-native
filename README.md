@@ -5,7 +5,7 @@
 
 Gimly SSI-NFC SDK is a kit Self Sovereign Identity interactions between react native apps having an NFC reader and NFC cards.
 
-The SDK is used as an easy integration means for React Native applications equipped with an NFC reader. The SDK is targeted at Self Sovereign Identity and Authentication use cases, meaning it can be used to create asymmetric keys for Decentralized Identifiers, as well as store and present Verifiable Credentials and Verifiable Presentations. Given the private key is securely stored in the NFC cards protected environment, it means the solution provides security for SSI use cases on desktop and terminal environments which typically would not be possible otherwise.
+The SDK is an easy integration means for React Native applications equipped with an NFC reader. The SDK is targeted at Self Sovereign-Identity and Authentication use cases, meaning it can be used to create asymmetric keys for Decentralized Identifiers and store and present Verifiable Credentials and Verifiable Presentations. Given the private key is securely stored in the NFC cards protected environment, it means the solution provides security for SSI use cases on desktop and terminal environments which typically would not be possible otherwise.
 
 The current version of the SDK uses Tangem under the hood, which may require additional native changes documented [here](https://developers.tangem.com/getting-started/react-native)
 
